@@ -10,23 +10,15 @@ import (
 	"github.com/urfave/negroni"
 )
 
-func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	fmt.Fprint(w, "Welcome!\n")
-}
-
-func Hello(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	fmt.Fprintf(w, "hello, %s!\n", ps.ByName("name"))
-}
-
 func main() {
 	fmt.Println("Listening", config.Port)
 
-	r := route.Router{httprouter.New()}
-	r.Init()
+	router := route.Router{httprouter.New()}
+	router.Init()
 
-	n := negroni.New()
-	n.Use(negroni.NewLogger())
-	n.UseHandler(r)
+	middleware := negroni.New()
+	middleware.Use(negroni.NewLogger())
+	middleware.UseHandler(router)
 
-	http.ListenAndServe(config.Port, n)
+	http.ListenAndServe(config.Port, middleware)
 }
