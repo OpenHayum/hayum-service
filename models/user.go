@@ -10,15 +10,10 @@ type User struct {
 	ID          bson.ObjectId `json:"_id" bson:"_id"`
 	ArtistID    string        `json:"artistId" bson:"artistId"`
 	FullName    string        `json:"fullname" bson:"fullname"`
-	IsOldSong   bool          `json:"isOldSong" bson:"isOldSong"`
-	Album       string        `json:"album" bson:"album"`
-	Category    string        `json:"category" bson:"category"`
-	Thumbnail   string        `json:"thumbnail" bson:"thumbnail"`
+	Email       string        `json:"email" bson:"email"`
 	Status      string        `json:"status" bson:"status"`
 	Document    S3Document    `json:"s3Document" bson:"s3Document"`
 	Meta        userMeta      `json:"meta" bson:"meta"`
-	UploadedBy  string        `json:"uploadedBy" bson:"uploadedBy"`
-	ModeratedBy string        `json:"moderatedBy" bson:"moderatedBy"`
 	CreatedDate time.Time     `json:"createdDate" bson:"createdDate"`
 	UpdatedDate time.Time     `json:"updatedDate" bson:"updatedDate"`
 	DeletedDate time.Time     `json:"deletedDate" bson:"deletedDate"`
