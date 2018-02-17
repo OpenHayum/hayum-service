@@ -16,17 +16,16 @@ import (
 var schemaDecoder = schema.NewDecoder()
 
 type userRoute struct {
-	*Router
-	service  *service.UserService
-	basePath string
+	router  *Router
+	service *service.UserService
 }
 
-func initUserRoute(r *Router, basePath string) {
-	service := service.NewUserService(r.Mongo)
-	route := &userRoute{Router: r, service: service, basePath: basePath}
+func initUserRoute(router *Router, basePath string) {
+	service := service.NewUserService(router.Mongo)
+	u := &userRoute{router: router, service: service}
 
-	route.POST(util.ConstructEndpoint(basePath, "/user"), route.createUser)
-	route.GET(util.ConstructEndpoint(basePath, "/user/:id"), route.getUser)
+	u.router.POST(util.ConstructEndpoint(basePath, "/user"), u.createUser)
+	u.router.GET(util.ConstructEndpoint(basePath, "/user/:id"), u.getUser)
 }
 
 func (u *userRoute) createUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -43,5 +42,5 @@ func (u *userRoute) getUser(w http.ResponseWriter, r *http.Request, ps httproute
 		log.Println("Cannot get user id")
 	}
 
-	u.Send(w, user)
+	u.router.Send(w, user)
 }
