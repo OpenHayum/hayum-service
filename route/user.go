@@ -13,9 +13,11 @@ func getUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	fmt.Fprintf(w, "hello, %s!\n", ps.ByName("name"))
 }
 
-type UserRoute struct{}
+type UserRoute struct {
+	*Router
+}
 
-func (r *Router) UserRoute(basePath string) {
+func (u *UserRoute) UserRoute(basePath string) {
 	userService := service.NewUserService(r.Mongo)
-	r.GET(util.ConstructEndpoint(basePath, "/:name"), getUser(use))
+	u.GET(util.ConstructEndpoint(basePath, "/:name"), getUser(use))
 }
