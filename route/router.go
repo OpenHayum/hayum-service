@@ -14,6 +14,5 @@ type Router struct {
 }
 
 func (r *Router) Init() {
-	r.UserRoute(util.ConstructEndpoint(apiVersion1, "/user/"))
-	r.ItemRoute(util.ConstructEndpoint(apiVersion1, "/item/"))
+	initUserRoute(r, util.ConstructEndpoint(apiVersion1, "/"))
 }
