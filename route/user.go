@@ -1,7 +1,6 @@
 package route
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -39,9 +38,10 @@ func (u *userRoute) createUser(w http.ResponseWriter, r *http.Request, ps httpro
 
 func (u *userRoute) getUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	user, err := u.service.GetUserById(ps.ByName("id"))
+
 	if err != nil {
 		log.Println("Cannot get user id")
 	}
-	fmt.Fprintf(w, "User Id: %s!\n", ps.ByName("id"))
+
 	u.Send(w, user)
 }
