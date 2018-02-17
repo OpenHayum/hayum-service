@@ -20,7 +20,9 @@ func main() {
 	port := appConfig.GetString("port")
 	fmt.Println("Listening", port)
 
-	router := route.Router{httprouter.New()}
+	mongo, err := config.NewMongoSession(appConfig.GetString("db_test_url"), appConfig.GetString("db_name"))
+
+	router := route.Router{Router: httprouter.New(), Mongo: mongo}
 	router.Init()
 
 	middleware := negroni.New()
