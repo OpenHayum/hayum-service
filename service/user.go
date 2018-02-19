@@ -7,7 +7,7 @@ import (
 )
 
 type userRepository interface {
-	GetUserById(id string) (*models.User, error)
+	GetUserByID(id string) (*models.User, error)
 }
 
 type UserService struct {
@@ -18,6 +18,6 @@ func NewUserService(mongo *config.Mongo) *UserService {
 	return &UserService{repository.NewUserRepository(repository.NewRepository(mongo, "user"))}
 }
 
-func (s *UserService) GetUserById(id string) (*models.User, error) {
-	return s.repository.GetUserById(id)
+func (s *UserService) GetUserByID(id string) (*models.User, error) {
+	return s.repository.GetUserByID(id)
 }
