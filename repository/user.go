@@ -17,6 +17,7 @@ func NewUserRepository(r *Repository) *UserRepository {
 
 // CreateNewUser creates a new user
 func (r *UserRepository) CreateNewUser(user *models.User) error {
+	user.ID = bson.NewObjectId()
 	err := r.Insert(user)
 	return err
 }
