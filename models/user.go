@@ -25,6 +25,7 @@ type User struct {
 	ID                        bson.ObjectId `json:"_id" bson:"_id"`
 	ArtistID                  string        `json:"artistId" bson:"artistId"`
 	FullName                  string        `json:"fullName" bson:"fullName"`
+	UserName                  string        `json:"userName" bson:"userName"`
 	Email                     string        `json:"email" bson:"email"`
 	MobileNumber              string        `json:"mobileNumber" bson:"mobileNumber"`
 	Otp                       rune          `json:"otp" bson:"otp"`

@@ -33,10 +33,12 @@ func (u *userRoute) createUser(w http.ResponseWriter, r *http.Request, ps httpro
 	user := new(models.User)
 
 	schemaDecoder.Decode(user, r.PostForm)
+	u.service.CreateNewUser(user)
+	u.router.Send(w, user)
 }
 
 func (u *userRoute) getUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	user, err := u.service.GetUserById(ps.ByName("id"))
+	user, err := u.service.GetUserByID(ps.ByName("id"))
 
 	if err != nil {
 		log.Println("Cannot get user id")

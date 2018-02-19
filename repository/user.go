@@ -15,6 +15,12 @@ func NewUserRepository(r *Repository) *UserRepository {
 	return &UserRepository{r}
 }
 
+// CreateNewUser creates a new user
+func (r *UserRepository) CreateNewUser(user *models.User) error {
+	err := r.Insert(user)
+	return err
+}
+
 // GetUserByID gets user by Id
 func (r *UserRepository) GetUserByID(id string) (*models.User, error) {
 	var user *models.User
