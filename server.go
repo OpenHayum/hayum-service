@@ -22,6 +22,10 @@ func main() {
 
 	mongo, err := config.NewMongoSession(appConfig.GetString("db_test_url"), appConfig.GetString("db_name"))
 
+	if err != nil {
+		log.Panic(err.Error())
+	}
+
 	router := route.Router{Router: httprouter.New(), Mongo: mongo}
 	router.Init()
 

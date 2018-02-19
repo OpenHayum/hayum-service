@@ -30,10 +30,20 @@ func initUserRoute(router *Router, basePath string) {
 
 func (u *userRoute) createUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	schemaDecoder.SetAliasTag("json")
-	user := new(models.User)
+	var user models.User
 
-	schemaDecoder.Decode(user, r.PostForm)
-	u.service.CreateNewUser(user)
+	if err := r.ParseForm(); err != nil {
+		log.Panicln(err.Error())
+	}
+
+	if err := schemaDecoder.Decode(&user, r.PostForm); err != nil {
+		log.Panic(err.Error())
+	}
+
+	if err := u.service.CreateNewUser(&user); err != nil {
+		log.Panic(err.Error())
+	}
+
 	u.router.Send(w, user)
 }
 
