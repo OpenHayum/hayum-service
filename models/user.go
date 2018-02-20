@@ -40,7 +40,6 @@ type User struct {
 }
 
 type userMeta struct {
-	Size                  string `json:"size" bson:"size"`
 	Downloads             int    `json:"downloads" bson:"downloads"`
 	Views                 int    `json:"views" bson:"views"`
 	NumberOfFavorites     int    `json:"numberOfFavorites" bson:"numberOfFavorites"`
