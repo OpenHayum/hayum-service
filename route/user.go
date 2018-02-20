@@ -1,6 +1,8 @@
 package route
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -32,16 +34,13 @@ func (u *userRoute) createUser(w http.ResponseWriter, r *http.Request, ps httpro
 	schemaDecoder.SetAliasTag("json")
 	var user models.User
 
-	if err := r.ParseForm(); err != nil {
-		log.Panicln(err.Error())
-	}
-
-	if err := schemaDecoder.Decode(&user, r.PostForm); err != nil {
-		log.Panic(err.Error())
+	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+		http.Error(w, err.Error(), 400)
+		return
 	}
 
 	if err := u.service.CreateNewUser(&user); err != nil {
-		log.Panic(err.Error())
+		fmt.Println(err.Error())
 	}
 
 	u.router.Send(w, user)
