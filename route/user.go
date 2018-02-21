@@ -2,7 +2,6 @@ package route
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -39,8 +38,14 @@ func (u *userRoute) createUser(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
+	if u, _ := u.service.GetUserByEmail(user.Email); u != nil {
+		http.Error(w, "User already exists!", 409)
+		return
+	}
+
 	if err := u.service.CreateNewUser(&user); err != nil {
-		fmt.Println(err.Error())
+		http.Error(w, err.Error(), 500)
+		return
 	}
 
 	u.router.Send(w, user)
@@ -51,6 +56,8 @@ func (u *userRoute) getUser(w http.ResponseWriter, r *http.Request, ps httproute
 
 	if err != nil {
 		log.Println("Cannot get user id")
+		http.Error(w, err.Error(), 404)
+		return
 	}
 
 	u.router.Send(w, user)
