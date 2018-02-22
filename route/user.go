@@ -36,20 +36,21 @@ func (u *userRoute) createUser(w http.ResponseWriter, r *http.Request, ps httpro
 	var user models.User
 
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	if u, _ := u.service.GetUserByEmail(user.Email); u != nil {
-		http.Error(w, "User already exists!", 409)
+		http.Error(w, "User already exists!", http.StatusConflict)
 		return
 	}
 
 	if err := u.service.CreateNewUser(&user); err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	w.WriteHeader(http.StatusCreated)
 	u.router.Send(w, user)
 }
 
@@ -58,7 +59,7 @@ func (u *userRoute) getUser(w http.ResponseWriter, r *http.Request, ps httproute
 
 	if err != nil {
 		log.Println("Cannot get user id")
-		http.Error(w, err.Error(), 404)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
