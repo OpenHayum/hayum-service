@@ -7,7 +7,6 @@ import (
 
 	"bitbucket.org/hayum/hayum-service/config"
 	"bitbucket.org/hayum/hayum-service/route"
-	"github.com/julienschmidt/httprouter"
 	"github.com/urfave/negroni"
 )
 
@@ -18,16 +17,11 @@ func main() {
 	}
 
 	port := appConfig.GetString("port")
+	dbURL := appConfig.GetString("db_test_url")
+	dbName := appConfig.GetString("db_name")
 	fmt.Println("Listening", port)
 
-	mongo, err := config.NewMongoSession(appConfig.GetString("db_test_url"), appConfig.GetString("db_name"))
-
-	if err != nil {
-		log.Panic(err.Error())
-	}
-
-	router := route.Router{Router: httprouter.New(), Mongo: mongo}
-	router.Init()
+	router := route.NewRouter(dbURL, dbName)
 
 	middleware := negroni.New()
 	middleware.Use(negroni.NewLogger())
