@@ -7,7 +7,9 @@ import (
 
 	"github.com/gorilla/schema"
 
+	"bitbucket.org/hayum/hayum-service/config"
 	"bitbucket.org/hayum/hayum-service/models"
+	"bitbucket.org/hayum/hayum-service/repository"
 	"bitbucket.org/hayum/hayum-service/util"
 
 	"bitbucket.org/hayum/hayum-service/service"
@@ -22,7 +24,7 @@ type userRoute struct {
 }
 
 func initUserRoute(router *Router, basePath string) {
-	service := service.NewUserService(router.Mongo)
+	service := service.NewUserService(repository.NewRepository(router.Mongo, config.CollectionUser))
 	u := &userRoute{router: router, service: service}
 
 	u.router.POST(util.ConstructEndpoint(basePath, "/user"), u.createUser)
