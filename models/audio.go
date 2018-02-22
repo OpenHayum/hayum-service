@@ -12,7 +12,7 @@ const (
 	HyCategoryRadioLila  = "RADIO_LILA"
 )
 
-type Item struct {
+type Audio struct {
 	ID          bson.ObjectId `json:"_id" bson:"_id"`
 	Name        string        `json:"name" bson:"name"`
 	ArtistID    string        `json:"artistId" bson:"artistId"`
