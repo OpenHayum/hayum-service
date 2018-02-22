@@ -2,6 +2,7 @@ package route
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"bitbucket.org/hayum/hayum-service/config"
@@ -17,9 +18,20 @@ type Router struct {
 	*config.Mongo
 }
 
-// Init initializes all routes of the service
-func (r *Router) Init() {
-	initUserRoute(r, util.ConstructEndpoint(apiVersion1, "/"))
+// NewRouter initializes all routes of the service
+func NewRouter(dbURL string, dbName string) *Router {
+
+	mongo, err := config.NewMongoSession(dbURL, dbName)
+
+	if err != nil {
+		log.Panic(err.Error())
+	}
+
+	router := Router{Router: httprouter.New(), Mongo: mongo}
+
+	initUserRoute(&router, util.ConstructEndpoint(apiVersion1, "/"))
+
+	return &router
 }
 
 // Send writes the model to ResponseWriter
