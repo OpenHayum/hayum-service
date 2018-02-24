@@ -1,6 +1,8 @@
 package util
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestConstructEndpoint(t *testing.T) {
 	type args struct {
@@ -12,7 +14,14 @@ func TestConstructEndpoint(t *testing.T) {
 		args args
 		want string
 	}{
-	// TODO: Add test cases.
+		{
+			name: "Test endpoint construction",
+			args: args{
+				basePath: "/api/v1",
+				pathName: "/user/{id}",
+			},
+			want: "/api/v1/user/{id}",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -21,4 +30,12 @@ func TestConstructEndpoint(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGenerateOTP(t *testing.T) {
+	t.Run("Test OTP generation", func(t *testing.T) {
+		if got := GenerateOTP(); got == 0 {
+			t.Errorf("GenerateOTP() = %v, want 4 digit random number", got)
+		}
+	})
 }
