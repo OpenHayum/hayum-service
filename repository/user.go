@@ -18,20 +18,19 @@ func NewUserRepository(r *Repository) *UserRepository {
 // CreateNewUser creates a new user
 func (r *UserRepository) CreateNewUser(user *models.User) error {
 	user.ID = bson.NewObjectId()
-	err := r.Insert(user)
+	err := r.Save(&user)
 	return err
 }
 
 // GetUserByID gets user by Id
 func (r *UserRepository) GetUserByID(id string) (*models.User, error) {
-	var user *models.User
-	err := r.FindId(id).One(&user)
-	return user, err
+	user, err := r.GetByID(id)
+	return user.(*models.User), err
 }
 
 // GetUserByEmail gets user by email
 func (r *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 	var user *models.User
-	err := r.Find(bson.M{"email": email}).One(&user)
+	err := r.collection.Find(bson.M{"email": email}).One(&user)
 	return user, err
 }
