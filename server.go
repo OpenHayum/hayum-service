@@ -17,8 +17,8 @@ func main() {
 	}
 
 	port := appConfig.GetString("port")
-	dbURL := appConfig.GetString("db_test_url")
-	dbName := appConfig.GetString("db_name")
+	dbURL := appConfig.GetString("dev_db_url")
+	dbName := appConfig.GetString("dev_db_name")
 	fmt.Println("Listening", port)
 
 	router := route.NewRouter(dbURL, dbName)
