@@ -28,12 +28,13 @@ type User struct {
 	UserName                  string        `json:"userName" bson:"userName"`
 	Email                     string        `json:"email" bson:"email"`
 	MobileNumber              string        `json:"mobileNumber" bson:"mobileNumber"`
-	Otp                       rune          `json:"otp" bson:"otp"`
-	Salt                      string        `json:"salt" bson:"salt"`
+	Password                  string        `json:"password" bson:"password"`
 	Role                      string        `json:"role" bson:"role"`
 	IsUserVerified            bool          `json:"isUserVerified" bson:"isUserVerified"`
 	HasUserVerifiedAsAnArtist bool          `json:"hasUserVerifiedAsAnArtist" bson:"hasUserVerifiedAsAnArtist"`
 	Meta                      userMeta      `json:"meta" bson:"meta"`
+	Otp                       int32         `json:"otp" bson:"otp"`
+	OtpExpirationDate         time.Time     `json:"otpExpirationDate" bson:"otpExpirationDate"`
 	CreatedDate               time.Time     `json:"createdDate" bson:"createdDate"`
 	UpdatedDate               time.Time     `json:"updatedDate" bson:"updatedDate"`
 	DeletedDate               time.Time     `json:"deletedDate" bson:"deletedDate"`
