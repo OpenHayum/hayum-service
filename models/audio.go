@@ -12,6 +12,7 @@ const (
 	HyCategoryRadioLila  = "RADIO_LILA"
 )
 
+// Audio contains Audio model
 type Audio struct {
 	ID          bson.ObjectId `json:"_id" bson:"_id"`
 	Name        string        `json:"name" bson:"name"`
@@ -22,7 +23,7 @@ type Audio struct {
 	Thumbnail   string        `json:"thumbnail" bson:"thumbnail"`
 	Status      string        `json:"status" bson:"status"`
 	Document    S3Document    `json:"s3Document" bson:"s3Document"`
-	Meta        itemMeta      `json:"meta" bson:"meta"`
+	Meta        audioMeta     `json:"meta" bson:"meta"`
 	UploadedBy  string        `json:"uploadedBy" bson:"uploadedBy"`
 	ModeratedBy string        `json:"moderatedBy" bson:"moderatedBy"`
 	CreatedDate time.Time     `json:"createdDate" bson:"createdDate"`
@@ -30,7 +31,7 @@ type Audio struct {
 	DeletedDate time.Time     `json:"deletedDate" bson:"deletedDate"`
 }
 
-type itemMeta struct {
+type audioMeta struct {
 	Size              rune  `json:"size" bson:"size"`
 	Downloads         int64 `json:"downloads" bson:"downloads"`
 	Views             int64 `json:"views" bson:"views"`
