@@ -5,8 +5,9 @@ import (
 	"reflect"
 	"testing"
 
+	"bitbucket.org/hayum/hayum-service/models"
+
 	"github.com/stretchr/testify/mock"
-	"gopkg.in/mgo.v2"
 )
 
 type repositoryMock struct {
@@ -16,6 +17,11 @@ type repositoryMock struct {
 func (m *repositoryMock) Save(model interface{}) error {
 	args := m.Called(model)
 	return args.Error(0)
+}
+
+func (m *repositoryMock) GetByID(id string) (interface{}, error) {
+	args := m.Called(id)
+	return args.Get(0), args.Error(1)
 }
 
 func TestRepository_Save(t *testing.T) {
@@ -54,33 +60,39 @@ func TestRepository_Save(t *testing.T) {
 }
 
 func TestRepository_GetByID(t *testing.T) {
-	type fields struct {
-		collection *mgo.Collection
-	}
-	type args struct {
-		id string
-	}
+	mock := new(repositoryMock)
 	tests := []struct {
 		name    string
-		fields  fields
-		args    args
-		want    interface{}
+		id      string
+		err     error
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "Test Repository GetByID fail",
+			id:      "id",
+			err:     errors.New("Unable to save"),
+			wantErr: true,
+		},
+		{
+			name:    "Test Repository GetByID success",
+			id:      "id",
+			err:     nil,
+			wantErr: false,
+		},
 	}
+
+	u := new(models.User)
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &Repository{
-				collection: tt.fields.collection,
-			}
-			got, err := r.GetByID(tt.args.id)
-			if (err != nil) != tt.wantErr {
+			mock.On("GetByID", tt.id).Return(u, tt.err)
+			got, err := mock.GetByID(tt.id)
+			if (err == tt.err) != tt.wantErr {
 				t.Errorf("Repository.GetByID() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Repository.GetByID() = %v, want %v", got, tt.want)
+			if !reflect.DeepEqual(got, u) {
+				t.Errorf("Repository.GetByID() = %v, want %v", got, u)
 			}
 		})
 	}
