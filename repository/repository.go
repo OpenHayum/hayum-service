@@ -11,7 +11,7 @@ type BaseRepository interface {
 	GetByID(id string) (interface{}, error)
 }
 
-// Repository maintains a mgo.Collection
+// Repository maintains a mgo.Collection which persist data in the database
 type Repository struct {
 	collection *mgo.Collection
 }

@@ -20,7 +20,7 @@ var schemaDecoder = schema.NewDecoder()
 
 type userRoute struct {
 	router  *Router
-	service *service.UserService
+	service service.UserServicer
 }
 
 func initUserRoute(router *Router, basePath string) {
