@@ -23,9 +23,8 @@ func (r *UserRepository) CreateNewUser(user *models.User) error {
 }
 
 // GetUserByID gets user by Id
-func (r *UserRepository) GetUserByID(id string) (*models.User, error) {
-	user, err := r.GetByID(id)
-	return user.(*models.User), err
+func (r *UserRepository) GetUserByID(id string, u *models.User) error {
+	return r.GetByID(id, u)
 }
 
 // GetUserByEmail gets user by email

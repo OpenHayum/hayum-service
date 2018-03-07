@@ -30,7 +30,7 @@ func TestNewUserService(t *testing.T) {
 
 func TestUserService_CreateNewUser(t *testing.T) {
 	type fields struct {
-		repository userRepository
+		repository *repository.UserRepository
 	}
 	type args struct {
 		user *models.User
@@ -57,7 +57,7 @@ func TestUserService_CreateNewUser(t *testing.T) {
 
 func TestUserService_GetUserByID(t *testing.T) {
 	type fields struct {
-		repository userRepository
+		repository *repository.UserRepository
 	}
 	type args struct {
 		id string
@@ -90,7 +90,7 @@ func TestUserService_GetUserByID(t *testing.T) {
 
 func TestUserService_GetUserByEmail(t *testing.T) {
 	type fields struct {
-		repository userRepository
+		repository *repository.UserRepository
 	}
 	type args struct {
 		email string

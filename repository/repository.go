@@ -28,8 +28,6 @@ func (r *Repository) Save(model interface{}) error {
 }
 
 // GetByID implements BaseRepository GetByID
-func (r *Repository) GetByID(id string) (interface{}, error) {
-	var model interface{}
-	err := r.collection.FindId(id).One(model)
-	return &model, err
+func (r *Repository) GetByID(id string, model interface{}) error {
+	return r.collection.FindId(id).One(&model)
 }

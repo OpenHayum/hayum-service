@@ -11,7 +11,7 @@ import (
 // UserServicer exposes methods which can be perform
 type UserServicer interface {
 	CreateNewUser(user *models.User) error
-	GetUserByID(id string) (models.User, error)
+	GetUserByID(id string) (*models.User, error)
 	GetUserByEmail(email string) (*models.User, error)
 }
 
@@ -46,7 +46,7 @@ func (s *UserService) CreateNewUser(user *models.User) error {
 }
 
 // GetUserByID get User by ID
-func (s *UserService) GetUserByID(id string) (models.User, error) {
+func (s *UserService) GetUserByID(id string) (*models.User, error) {
 	return s.repository.GetUserByID(id)
 }
 
