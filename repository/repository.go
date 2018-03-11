@@ -11,23 +11,23 @@ type BaseRepository interface {
 	GetByID(id string) (interface{}, error)
 }
 
-// Repository maintains a mgo.Collection which persist data in the database
-type Repository struct {
+// MongoRepository maintains a mgo.Collection which persist data in the database
+type MongoRepository struct {
 	collection *mgo.Collection
 }
 
 // NewRepository creates a new Repository
-func NewRepository(mongo *config.Mongo, collectionName string) *Repository {
-	return &Repository{mongo.C(collectionName)}
+func NewRepository(mongo *config.Mongo, collectionName string) *MongoRepository {
+	return &MongoRepository{mongo.C(collectionName)}
 }
 
 // Save implements BaseRepository Save
-func (r *Repository) Save(model interface{}) error {
-	err := r.collection.Insert(model)
+func (mr *MongoRepository) Save(model interface{}) error {
+	err := mr.collection.Insert(model)
 	return err
 }
 
 // GetByID implements BaseRepository GetByID
-func (r *Repository) GetByID(id string, model interface{}) error {
-	return r.collection.FindId(id).One(&model)
+func (mr *MongoRepository) GetByID(id string, model interface{}) error {
+	return mr.collection.FindId(id).One(&model)
 }

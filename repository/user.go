@@ -7,11 +7,11 @@ import (
 
 // UserRepository embeds a Repository
 type UserRepository struct {
-	*Repository
+	*MongoRepository
 }
 
 // NewUserRepository creates a new UserRepository
-func NewUserRepository(r *Repository) *UserRepository {
+func NewUserRepository(r *MongoRepository) *UserRepository {
 	return &UserRepository{r}
 }
 
