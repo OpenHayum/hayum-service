@@ -32,6 +32,8 @@ func initConfig() {
 		log.Panic(err)
 	}
 
+	port = appConfig.GetString("port")
+
 	switch env {
 	case devEnv:
 		dbURL = appConfig.GetString("db.dev.url")
@@ -43,9 +45,6 @@ func initConfig() {
 		dbURL = "localhost"
 		dbName = "hayum"
 	}
-
-	port := appConfig.GetString("port")
-	fmt.Println("Listening", port)
 }
 
 func main() {
@@ -55,7 +54,9 @@ func main() {
 
 	middleware := negroni.New()
 	middleware.Use(negroni.NewLogger())
-	middleware.UseHandler(router)
+	middleware.UseHandler(router.GetRouter())
 
-	http.ListenAndServe(port, middleware)
+	fmt.Println("Listening", port)
+
+	log.Panic(http.ListenAndServe(port, middleware))
 }

@@ -10,7 +10,6 @@ import (
 	"bitbucket.org/hayum/hayum-service/config"
 	"bitbucket.org/hayum/hayum-service/models"
 	"bitbucket.org/hayum/hayum-service/repository"
-	"bitbucket.org/hayum/hayum-service/util"
 
 	"bitbucket.org/hayum/hayum-service/service"
 	"github.com/julienschmidt/httprouter"
@@ -19,16 +18,16 @@ import (
 var schemaDecoder = schema.NewDecoder()
 
 type userRoute struct {
-	router  *Router
+	router  Router
 	service service.UserServicer
 }
 
-func initUserRoute(router *Router, basePath string) {
-	service := service.NewUserService(repository.NewRepository(router.Mongo, config.CollectionUser))
-	u := &userRoute{router: router, service: service}
+func initUserRoute(router Router) {
+	service := service.NewUserService(repository.NewRepository(router.GetMongo(), config.CollectionUser))
+	u := &userRoute{router, service}
 
-	u.router.POST(util.ConstructEndpoint(basePath, "/user"), u.createUser)
-	u.router.GET(util.ConstructEndpoint(basePath, "/user/:id"), u.getUser)
+	u.router.POST("/user", u.createUser)
+	u.router.GET("/user/:id", u.getUser)
 }
 
 func (u *userRoute) createUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
