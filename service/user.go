@@ -11,7 +11,7 @@ import (
 // UserServicer exposes methods which can be perform
 type UserServicer interface {
 	CreateNewUser(user *models.User) error
-	GetUserByID(id string) (*models.User, error)
+	GetUserByID(id string, user *models.User) error
 	GetUserByEmail(email string) (*models.User, error)
 }
 
@@ -21,7 +21,7 @@ type UserService struct {
 }
 
 // NewUserService creates a new UserService
-func NewUserService(r *repository.Repository) *UserService {
+func NewUserService(r *repository.MongoRepository) *UserService {
 	return &UserService{repository.NewUserRepository(r)}
 }
 
@@ -46,8 +46,8 @@ func (s *UserService) CreateNewUser(user *models.User) error {
 }
 
 // GetUserByID get User by ID
-func (s *UserService) GetUserByID(id string) (*models.User, error) {
-	return s.repository.GetUserByID(id)
+func (s *UserService) GetUserByID(id string, u *models.User) error {
+	return s.repository.GetUserByID(id, u)
 }
 
 // GetUserByEmail gets User by email
