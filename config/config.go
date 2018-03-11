@@ -21,20 +21,35 @@ const (
 
 	// CollectionS3Document collection name for S3 Documents
 	CollectionS3Document = "s3Documents"
+
+	// ExternalConfigFilePath external config file path
+	ExternalConfigFilePath = "/opt/conf/hayum"
 )
 
-// LoadConfig loads any yaml config file
-func LoadConfig(configPaths ...string) (*viper.Viper, error) {
-	v := viper.New()
-	v.SetConfigName("config")
-	v.SetConfigType("yaml")
-	v.AutomaticEnv()
-	for _, path := range configPaths {
-		v.AddConfigPath(path)
-	}
+// Detail stores the configuration file details
+type Detail struct {
+	Path string
+	Name string
+	Type string
+}
 
-	if err := v.ReadInConfig(); err != nil {
-		return nil, fmt.Errorf("Failed to read the configuration file: %s", err)
+// NewDetail creates a new Detail
+func NewDetail(path string, name string) *Detail {
+	return &Detail{path, name, "yaml"}
+}
+
+// LoadConfig loads any yaml config file
+func LoadConfig(details ...*Detail) (*viper.Viper, error) {
+	v := viper.New()
+
+	for _, configDetail := range details {
+		v.AddConfigPath(configDetail.Path)
+		v.SetConfigName(configDetail.Name)
+		v.SetConfigType(configDetail.Type)
+
+		if err := v.MergeInConfig(); err != nil {
+			return nil, fmt.Errorf("Failed to read the configuration file: %s", err)
+		}
 	}
 
 	return v, nil

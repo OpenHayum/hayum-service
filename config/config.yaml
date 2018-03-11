@@ -1,5 +1,8 @@
-port: ":8080"
-dev_db_url: "localhost"
-dev_db_name: "hayum"
+port: :8080
 
-test_db_name: "test_hayum"
+db:
+  dev:
+    url: localhost
+    name: hayum
+  test:
+    name: test_hayum

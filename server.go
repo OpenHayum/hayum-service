@@ -4,22 +4,52 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"bitbucket.org/hayum/hayum-service/config"
 	"bitbucket.org/hayum/hayum-service/route"
 	"github.com/urfave/negroni"
 )
 
-func main() {
-	appConfig, err := config.LoadConfig("./config")
+const (
+	devEnv  = "dev"
+	prodEnv = "prod"
+	testEnv = "test"
+)
+
+var dbName, dbURL, port string
+
+func initConfig() {
+	env := os.Getenv("GO_ENV")
+	fmt.Println("GO_ENV:", env)
+
+	internalConfigDetail := config.NewDetail("./config", "config")
+	externalConfigDetail := config.NewDetail(config.ExternalConfigFilePath, "external_config")
+
+	appConfig, err := config.LoadConfig(internalConfigDetail, externalConfigDetail)
+
 	if err != nil {
 		log.Panic(err)
 	}
 
+	switch env {
+	case devEnv:
+		dbURL = appConfig.GetString("db.dev.url")
+		dbName = appConfig.GetString("db.dev.name")
+	case prodEnv:
+		dbURL = appConfig.GetString("db.prod.url")
+		dbName = appConfig.GetString("db.prod.name")
+	default:
+		dbURL = "localhost"
+		dbName = "hayum"
+	}
+
 	port := appConfig.GetString("port")
-	dbURL := appConfig.GetString("dev_db_url")
-	dbName := appConfig.GetString("dev_db_name")
 	fmt.Println("Listening", port)
+}
+
+func main() {
+	initConfig()
 
 	router := route.NewRouter(dbURL, dbName)
 
