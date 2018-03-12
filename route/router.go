@@ -17,6 +17,7 @@ type Router interface {
 	GET(path string, handle httprouter.Handle)
 	POST(path string, handle httprouter.Handle)
 	Send(w http.ResponseWriter, response interface{})
+	JSON(w http.ResponseWriter, response interface{})
 	GetMongo() *config.Mongo
 	GetRouter() *httprouter.Router
 }
@@ -48,9 +49,13 @@ func (hr *hayumRouter) GetRouter() *httprouter.Router {
 	return hr.router
 }
 
-// Send writes the model to ResponseWriter
 func (hr *hayumRouter) Send(w http.ResponseWriter, response interface{}) {
 	json.NewEncoder(w).Encode(response)
+}
+
+func (hr *hayumRouter) JSON(w http.ResponseWriter, response interface{}) {
+	w.Header().Add("Content-Type", "application/json")
+	hr.Send(w, response)
 }
 
 // NewRouter initializes all routes of the service

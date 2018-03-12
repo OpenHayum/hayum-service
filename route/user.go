@@ -63,5 +63,5 @@ func (u *userRoute) getUser(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
-	u.router.Send(w, user)
+	u.router.JSON(w, user)
 }
