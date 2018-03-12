@@ -3,6 +3,7 @@ package repository
 import (
 	"bitbucket.org/hayum/hayum-service/config"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // BaseRepository defines all default repository methods
@@ -29,5 +30,5 @@ func (mr *MongoRepository) Save(model interface{}) error {
 
 // GetByID implements BaseRepository GetByID
 func (mr *MongoRepository) GetByID(id string, model interface{}) error {
-	return mr.collection.FindId(id).One(&model)
+	return mr.collection.FindId(bson.ObjectIdHex(id)).One(model)
 }
