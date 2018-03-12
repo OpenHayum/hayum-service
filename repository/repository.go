@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"bitbucket.org/hayum/hayum-service/config"
+	"bitbucket.org/hayum/hayum-service/db"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -18,7 +18,7 @@ type MongoRepository struct {
 }
 
 // NewRepository creates a new Repository
-func NewRepository(mongo *config.Mongo, collectionName string) *MongoRepository {
+func NewRepository(mongo *db.Mongo, collectionName string) *MongoRepository {
 	return &MongoRepository{mongo.C(collectionName)}
 }
 
