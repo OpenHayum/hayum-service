@@ -1,4 +1,4 @@
-package core
+package royalty
 
 const (
 	// MinArtistPopularityRate is the min popularity of the artist
