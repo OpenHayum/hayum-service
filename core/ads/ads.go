@@ -11,7 +11,6 @@ const (
 	TypeVideo = "AD_VIDEO"
 )
 
-// Ads stores an ads info
-type Ads struct {
-	Type string
+// Advertiser holds the contract of Ads
+type Advertiser interface {
 }
