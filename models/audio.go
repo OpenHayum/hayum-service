@@ -7,9 +7,14 @@ import (
 )
 
 const (
-	HyCategorySong       = "SONG"
+	// HyCategorySong specifies song category
+	HyCategorySong = "SONG"
+
+	// HyCategorySumangLila specifies Sumang Lila category
 	HyCategorySumangLila = "SUMANG_LILA"
-	HyCategoryRadioLila  = "RADIO_LILA"
+
+	// HyCategoryRadioLila specifies Radio Lila category
+	HyCategoryRadioLila = "RADIO_LILA"
 )
 
 // Audio contains Audio model
