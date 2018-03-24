@@ -70,6 +70,7 @@ func NewRouter(dbURL string, dbName string) Router {
 	router := NewHayumRouter(mongo, util.ConstructEndpoint(apiVersion1, "/"))
 
 	initUserRoute(router)
+	initS3Route(router)
 
 	return router
 }

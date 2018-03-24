@@ -1,5 +1,7 @@
 port: :8080
 
+logpath: /var/log/hayum/log.txt
+
 db:
   dev:
     url: localhost

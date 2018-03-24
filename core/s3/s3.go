@@ -39,7 +39,12 @@ func (s *HayumS3Manager) Upload(file multipart.File, key string) error {
 		Body:   file,
 	})
 
-	fmt.Printf("File uploaded to, %s\n", aws.StringValue(&result.Location))
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	fmt.Printf("File uploaded to, %s\n", result.Location)
 
 	if err != nil {
 		return fmt.Errorf("failed to upload file, %v", err)

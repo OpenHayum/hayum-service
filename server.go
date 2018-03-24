@@ -1,10 +1,12 @@
 package main
 
 import (
-	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/spf13/viper"
 
 	"bitbucket.org/hayum/hayum-service/config"
 	"bitbucket.org/hayum/hayum-service/route"
@@ -17,16 +19,20 @@ const (
 	testEnv = "test"
 )
 
-var dbName, dbURL, port string
+var (
+	dbName, dbURL, port string
+	appConfig           *viper.Viper
+)
 
 func initConfig() {
 	env := os.Getenv("GO_ENV")
-	fmt.Println("GO_ENV:", env)
+	log.Println("GO_ENV:", env)
 
 	internalConfigDetail := config.NewDetail("./config", "config")
 	externalConfigDetail := config.NewDetail(config.ExternalConfigFilePath, "external_config")
 
-	appConfig, err := config.LoadConfig(internalConfigDetail, externalConfigDetail)
+	var err error
+	appConfig, err = config.LoadConfig(internalConfigDetail, externalConfigDetail)
 
 	if err != nil {
 		log.Panic(err)
@@ -47,8 +53,21 @@ func initConfig() {
 	}
 }
 
+func initLogger() {
+	logpath := appConfig.GetString("logpath")
+	f, err := os.OpenFile(logpath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer f.Close()
+	mw := io.MultiWriter(os.Stdout, f)
+	log.SetOutput(mw)
+	log.Printf("Using log path: %s\n", logpath)
+}
+
 func main() {
 	initConfig()
+	initLogger()
 
 	router := route.NewRouter(dbURL, dbName)
 
@@ -56,7 +75,7 @@ func main() {
 	middleware.Use(negroni.NewLogger())
 	middleware.UseHandler(router.GetRouter())
 
-	fmt.Println("Listening", port)
+	log.Println("Listening on port:", port)
 
 	log.Panic(http.ListenAndServe(port, middleware))
 }
