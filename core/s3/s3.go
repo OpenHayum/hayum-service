@@ -3,6 +3,7 @@ package s3
 import (
 	"fmt"
 	"log"
+	"mime/multipart"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -28,9 +29,9 @@ func New(directory string, bucket string) *HayumS3Manager {
 }
 
 // Upload uploads the file to s3
-func (s *HayumS3Manager) Upload(path string, key string) error {
+func (s *HayumS3Manager) Upload(file multipart.File, key string) error {
+	defer file.Close()
 	uploader := s3manager.NewUploader(s.Session)
-	file, err := os.Open(path)
 
 	result, err := uploader.Upload(&s3manager.UploadInput{
 		Bucket: aws.String(s.Bucket),

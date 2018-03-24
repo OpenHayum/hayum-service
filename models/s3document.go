@@ -14,5 +14,6 @@ type S3Document struct {
 	Bucket           string        `json:"bucket" bson:"bucket"`
 	IsDeleted        bool          `json:"isDeleted" bson:"isDeleted"`
 	CreatedDate      time.Time     `json:"createdDate" bson:"createdDate"`
+	ModifiedDate     time.Time     `json:"modifiedDate" bson:"modifiedDate"`
 	DeletedDate      time.Time     `json:"deletedDate" bson:"deletedDate"`
 }
