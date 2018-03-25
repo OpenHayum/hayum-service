@@ -21,7 +21,7 @@ type HayumS3Manager struct {
 
 // New creates a new Hayum S3 Manager
 func New(directory string, bucket string) *HayumS3Manager {
-	sess, err := session.NewSession(&aws.Config{Region: aws.String("us-west-2")})
+	sess, err := session.NewSession(&aws.Config{Region: aws.String("ap-south-1")})
 	if err != nil {
 		log.Panic(err)
 	}

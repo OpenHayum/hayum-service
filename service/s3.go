@@ -1,12 +1,12 @@
 package service
 
 import (
-	"errors"
 	"mime/multipart"
 	"time"
 
 	"gopkg.in/mgo.v2/bson"
 
+	"bitbucket.org/hayum/hayum-service/config"
 	"bitbucket.org/hayum/hayum-service/core/s3"
 	"bitbucket.org/hayum/hayum-service/models"
 
@@ -15,7 +15,7 @@ import (
 
 // S3Servicer holds the S3Service contracts
 type S3Servicer interface {
-	Upload(file multipart.File, header *multipart.FileHeader) error
+	Upload(file multipart.File, header *multipart.FileHeader) (string, error)
 }
 
 // S3Service holds the S3DocumentRepository
@@ -29,17 +29,22 @@ func NewS3DocumentService(r *repository.MongoRepository) *S3Service {
 }
 
 // Upload uploads a file
-func (s *S3Service) Upload(file multipart.File, header *multipart.FileHeader) error {
+func (s *S3Service) Upload(file multipart.File, header *multipart.FileHeader) (string, error) {
 	s3Document := new(models.S3Document)
 
 	s3Document.ID = bson.NewObjectId()
 	s3Document.OriginalFileName = header.Filename
 	s3Document.CreatedDate = time.Now()
 
-	uploadManager := s3.New("", "")
-	uploadManager.Upload(file, "")
+	s3Directory := config.App.GetString("s3.directory")
+	s3Bucket := config.App.GetString("s3.bucket")
 
-	s.repository.CreateNewS3Document(s3Document)
+	uploadManager := s3.New(s3Directory, s3Bucket)
+	uploadManager.Upload(file, header.Filename)
 
-	return errors.New("")
+	if err := s.repository.CreateNewS3Document(s3Document); err != nil {
+		return "", err
+	}
+
+	return s3Document.ID.Hex(), nil
 }
