@@ -8,3 +8,7 @@ db:
     name: hayum
   test:
     name: test_hayum
+
+s3:
+  bucket: test-hy
+  directory: tracks

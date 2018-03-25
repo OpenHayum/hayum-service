@@ -26,6 +26,9 @@ const (
 	ExternalConfigFilePath = "/opt/conf/hayum"
 )
 
+// App contains all config globally
+var App *viper.Viper
+
 // Detail stores the configuration file details
 type Detail struct {
 	Path string
@@ -51,6 +54,8 @@ func LoadConfig(details ...*Detail) (*viper.Viper, error) {
 			return nil, fmt.Errorf("Failed to read the configuration file: %s", err)
 		}
 	}
+
+	App = v
 
 	return v, nil
 }

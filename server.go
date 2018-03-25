@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/spf13/viper"
-
 	"bitbucket.org/hayum/hayum-service/config"
 	"bitbucket.org/hayum/hayum-service/route"
 	"github.com/urfave/negroni"
@@ -19,10 +17,7 @@ const (
 	testEnv = "test"
 )
 
-var (
-	dbName, dbURL, port string
-	appConfig           *viper.Viper
-)
+var dbName, dbURL, port string
 
 func initConfig() {
 	env := os.Getenv("GO_ENV")
@@ -32,21 +27,21 @@ func initConfig() {
 	externalConfigDetail := config.NewDetail(config.ExternalConfigFilePath, "external_config")
 
 	var err error
-	appConfig, err = config.LoadConfig(internalConfigDetail, externalConfigDetail)
+	_, err = config.LoadConfig(internalConfigDetail, externalConfigDetail)
 
 	if err != nil {
 		log.Panic(err)
 	}
 
-	port = appConfig.GetString("port")
+	port = config.App.GetString("port")
 
 	switch env {
 	case devEnv:
-		dbURL = appConfig.GetString("db.dev.url")
-		dbName = appConfig.GetString("db.dev.name")
+		dbURL = config.App.GetString("db.dev.url")
+		dbName = config.App.GetString("db.dev.name")
 	case prodEnv:
-		dbURL = appConfig.GetString("db.prod.url")
-		dbName = appConfig.GetString("db.prod.name")
+		dbURL = config.App.GetString("db.prod.url")
+		dbName = config.App.GetString("db.prod.name")
 	default:
 		dbURL = "localhost"
 		dbName = "hayum"
@@ -54,7 +49,7 @@ func initConfig() {
 }
 
 func initLogger() {
-	logpath := appConfig.GetString("logpath")
+	logpath := config.App.GetString("logpath")
 	f, err := os.OpenFile(logpath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Panic(err)
