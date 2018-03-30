@@ -23,7 +23,8 @@ type userRoute struct {
 }
 
 func initUserRoute(router Router) {
-	service := service.NewUserService(repository.NewRepository(router.GetMongo(), config.CollectionUser))
+	repository := repository.NewMongoRepository(router.GetMongo(), config.CollectionUser)
+	service := service.NewUserService(repository)
 	u := &userRoute{router, service}
 
 	u.router.POST("/user", u.createUser)
@@ -50,7 +51,7 @@ func (u *userRoute) createUser(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	u.router.Send(w, user)
+	u.router.JSON(w, user)
 }
 
 func (u *userRoute) getUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

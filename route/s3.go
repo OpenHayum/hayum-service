@@ -22,7 +22,8 @@ type uploadResponse struct {
 }
 
 func initS3Route(router Router) {
-	service := service.NewS3DocumentService(repository.NewRepository(router.GetMongo(), config.CollectionS3Document))
+	repository := repository.NewMongoRepository(router.GetMongo(), config.CollectionS3Document)
+	service := service.NewS3DocumentService(repository)
 	s3 := &s3Route{router, service}
 
 	s3.router.POST("/file/upload", s3.upload)

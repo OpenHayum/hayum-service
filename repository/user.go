@@ -5,6 +5,14 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// UserRepositorer defines UserRepository methods
+type UserRepositorer interface {
+	MongoRepositorer
+	CreateNewUser(user *models.User) error
+	GetUserByID(id string, u *models.User) error
+	GetUserByEmail(email string) (*models.User, error)
+}
+
 // UserRepository embeds a Repository
 type UserRepository struct {
 	*MongoRepository

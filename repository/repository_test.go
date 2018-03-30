@@ -24,7 +24,7 @@ func (m *repositoryMock) GetByID(id string) (interface{}, error) {
 	return args.Get(0), args.Error(1)
 }
 
-func TestRepository_Save(t *testing.T) {
+func TestRepositorySave(t *testing.T) {
 	m := &struct{ name string }{name: "asem"}
 	mock := new(repositoryMock)
 	tests := []struct {
@@ -59,7 +59,7 @@ func TestRepository_Save(t *testing.T) {
 	mock.AssertExpectations(t)
 }
 
-func TestRepository_GetByID(t *testing.T) {
+func TestRepositoryGetByID(t *testing.T) {
 	mock := new(repositoryMock)
 	tests := []struct {
 		name    string
