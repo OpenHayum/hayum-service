@@ -19,7 +19,9 @@ type MongoRepository struct {
 
 // NewRepository creates a new Repository
 func NewRepository(mongo *db.Mongo, collectionName string) *MongoRepository {
-	return &MongoRepository{mongo.C(collectionName)}
+	session := mongo.Session.Copy()
+	collection := session.DB(mongo.Db).C(collectionName)
+	return &MongoRepository{collection}
 }
 
 // Save implements BaseRepository Save

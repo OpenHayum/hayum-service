@@ -6,25 +6,25 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
+// Mongo holds mongo session and Db
 type Mongo struct {
-	*mgo.Database
+	*mgo.Session
+	Db string
 }
 
+// NewMongoSession creates a mongo session
 func NewMongoSession(url string, db string) (*Mongo, error) {
 	if url == "" {
 		return nil, fmt.Errorf("%s", "Mongo URL cannot be empty")
 	}
-
-	var session *mgo.Session
 
 	session, err := mgo.Dial(url)
 	if err != nil {
 		return nil, fmt.Errorf("%s", err)
 	}
 
-	database := session.DB(db)
-
 	return &Mongo{
-		Database: database,
+		session,
+		db,
 	}, nil
 }
