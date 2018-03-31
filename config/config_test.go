@@ -17,11 +17,12 @@ func TestLoadConfig(t *testing.T) {
 		want    *viper.Viper
 		wantErr bool
 	}{
-	// TODO: Add test cases.
+		// TODO: Add test cases.
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := LoadConfig(tt.args.configPaths...)
+			got, err := LoadConfig(&Detail{})
 			if (err != nil) != tt.wantErr {
 				t.Errorf("LoadConfig() error = %v, wantErr %v", err, tt.wantErr)
 				return
