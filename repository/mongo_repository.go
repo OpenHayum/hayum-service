@@ -35,6 +35,16 @@ func (mr *MongoRepository) GetByID(id string, model interface{}) error {
 	return mr.collection.FindId(bson.ObjectIdHex(id)).One(model)
 }
 
+// Delete implements Delete
+func (mr *MongoRepository) Delete(model interface{}) error {
+	return mr.collection.Remove(model)
+}
+
+// DeleteByID implements DeleteByID
+func (mr *MongoRepository) DeleteByID(id string) error {
+	return mr.collection.RemoveId(bson.ObjectIdHex(id))
+}
+
 // Count implements MongoRepositorer Count
 func (mr *MongoRepository) Count() (int, error) {
 	return mr.collection.Count()

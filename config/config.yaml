@@ -12,3 +12,6 @@ db:
 s3:
   bucket: test-hy
   directory: tracks
+
+# 30 days!!!
+sessionExpirationTimeInMS: 2592000000 
