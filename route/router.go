@@ -16,6 +16,7 @@ const apiVersion1 = "/api/v1/"
 type Router interface {
 	GET(path string, handle httprouter.Handle)
 	POST(path string, handle httprouter.Handle)
+	DELETE(path string, handle httprouter.Handle)
 	Send(w http.ResponseWriter, response interface{})
 	JSON(w http.ResponseWriter, response interface{})
 	GetMongo() *db.Mongo
@@ -39,6 +40,10 @@ func (hr *hayumRouter) GET(path string, handle httprouter.Handle) {
 
 func (hr *hayumRouter) POST(path string, handle httprouter.Handle) {
 	hr.router.POST(util.ConstructEndpoint(hr.basePath, path), handle)
+}
+
+func (hr *hayumRouter) DELETE(path string, handle httprouter.Handle) {
+	hr.router.DELETE(util.ConstructEndpoint(hr.basePath, path), handle)
 }
 
 func (hr *hayumRouter) GetMongo() *db.Mongo {

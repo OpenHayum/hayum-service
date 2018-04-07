@@ -22,6 +22,9 @@ const (
 	// CollectionS3Document collection name for S3 Documents
 	CollectionS3Document = "s3Documents"
 
+	// CollectionSession collection name for Session
+	CollectionSession = "sessions"
+
 	// ExternalConfigFilePath external config file path
 	ExternalConfigFilePath = "/opt/conf/hayum"
 )
