@@ -8,6 +8,7 @@ import (
 
 	"bitbucket.org/hayum/hayum-service/config"
 	"bitbucket.org/hayum/hayum-service/route"
+	"github.com/rs/cors"
 	"github.com/urfave/negroni"
 )
 
@@ -72,5 +73,7 @@ func main() {
 
 	log.Println("Listening on port:", port)
 
-	log.Panic(http.ListenAndServe(port, middleware))
+	handler := cors.Default().Handler(middleware)
+
+	log.Panic(http.ListenAndServe(port, handler))
 }
