@@ -5,8 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/schema"
-
 	"bitbucket.org/hayum/hayum-service/config"
 	"bitbucket.org/hayum/hayum-service/models"
 	"bitbucket.org/hayum/hayum-service/repository"
@@ -14,8 +12,6 @@ import (
 	"bitbucket.org/hayum/hayum-service/service"
 	"github.com/julienschmidt/httprouter"
 )
-
-var schemaDecoder = schema.NewDecoder()
 
 type userRoute struct {
 	router  Router
