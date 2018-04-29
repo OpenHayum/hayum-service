@@ -1,6 +1,8 @@
 package service
 
 import (
+	"time"
+
 	"bitbucket.org/hayum/hayum-service/models"
 	"bitbucket.org/hayum/hayum-service/repository"
 	"gopkg.in/mgo.v2/bson"
@@ -25,6 +27,7 @@ func NewAccountService(r *repository.MongoRepository) *AccountService {
 func (s *AccountService) CreateNewAccount(userID string, acc *models.Account) error {
 	acc.ID = bson.NewObjectId()
 	acc.UserID = userID
+	acc.CreatedDate = time.Now()
 	return s.repository.Save(acc)
 }
 
@@ -33,5 +36,6 @@ func (s *AccountService) GetAccountByID(id string, acc *models.Account) error {
 }
 
 func (s *AccountService) UpdateAccount(acc *models.Account) error {
+	acc.UpdatedDate = time.Now()
 	return s.repository.Save(acc)
 }

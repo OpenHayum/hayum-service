@@ -53,6 +53,7 @@ func (s *UserService) CreateNewUser(user *models.User) error {
 	}
 
 	user.Password = password
+	user.CreatedDate = time.Now()
 
 	err = s.repository.CreateNewUser(user)
 

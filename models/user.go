@@ -19,6 +19,7 @@ type User struct {
 	Verified           bool          `json:"verified" bson:"verified"`
 	VerifiedAsAnArtist bool          `json:"verifiedAsAnArtist" bson:"verifiedAsAnArtist"`
 	Otp                int32         `json:"otp" bson:"otp"`
+	IsDeleted          bool          `json:"isDeleted" bson:"isDeleted"`
 	OtpExpirationDate  time.Time     `json:"otpExpirationDate" bson:"otpExpirationDate"`
 	CreatedDate        time.Time     `json:"createdDate" bson:"createdDate"`
 	UpdatedDate        time.Time     `json:"updatedDate" bson:"updatedDate"`
