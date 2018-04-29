@@ -5,9 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"bitbucket.org/hayum/hayum-service/config"
-	"bitbucket.org/hayum/hayum-service/repository"
-
 	"bitbucket.org/hayum/hayum-service/service"
 	"github.com/julienschmidt/httprouter"
 )
@@ -22,8 +19,7 @@ type uploadResponse struct {
 }
 
 func initS3Route(router Router) {
-	repository := repository.NewMongoRepository(router.GetMongo(), config.CollectionS3Document)
-	service := service.NewS3DocumentService(repository)
+	service := service.NewS3DocumentService()
 	s3 := &s3Route{router, service}
 
 	s3.router.POST("/file/upload", s3.upload)

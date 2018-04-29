@@ -27,16 +27,17 @@ type UserServicer interface {
 	CreateNewUser(user *models.User) error
 	GetUserByID(id string, user *models.User) error
 	GetUserByEmail(email string) (*models.User, error)
+	Delete(user *models.User) error
 }
 
 // UserService implements all the methods in UserServicer
 type UserService struct {
-	repository *repository.UserRepository
+	repository repository.UserRepositorer
 }
 
 // NewUserService creates a new UserService
-func NewUserService(r *repository.MongoRepository) *UserService {
-	return &UserService{repository.NewUserRepository(r)}
+func NewUserService() *UserService {
+	return &UserService{repository.NewUserRepository()}
 }
 
 // CreateNewUser creates a new User
@@ -68,4 +69,9 @@ func (s *UserService) GetUserByID(id string, u *models.User) error {
 // GetUserByEmail gets User by email
 func (s *UserService) GetUserByEmail(email string) (*models.User, error) {
 	return s.repository.GetUserByEmail(email)
+}
+
+// Delete deletes an User
+func (s *UserService) Delete(user *models.User) error {
+	return s.repository.Delete(user)
 }

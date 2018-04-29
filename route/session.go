@@ -7,8 +7,6 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 
-	"bitbucket.org/hayum/hayum-service/config"
-	"bitbucket.org/hayum/hayum-service/repository"
 	"bitbucket.org/hayum/hayum-service/service"
 )
 
@@ -18,8 +16,7 @@ type sessionRoute struct {
 }
 
 func initSessionRoute(router Router) {
-	repository := repository.NewMongoRepository(router.GetMongo(), config.CollectionSession)
-	sessionService := service.NewSessionService(repository)
+	sessionService := service.NewSessionService()
 	s := &sessionRoute{router, sessionService}
 
 	s.router.POST("/session", s.createSession)

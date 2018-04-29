@@ -5,9 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"bitbucket.org/hayum/hayum-service/config"
 	"bitbucket.org/hayum/hayum-service/models"
-	"bitbucket.org/hayum/hayum-service/repository"
 
 	"bitbucket.org/hayum/hayum-service/service"
 	"github.com/julienschmidt/httprouter"
@@ -19,8 +17,7 @@ type userRoute struct {
 }
 
 func initUserRoute(router Router) {
-	repository := repository.NewMongoRepository(router.GetMongo(), config.CollectionUser)
-	service := service.NewUserService(repository)
+	service := service.NewUserService()
 	u := &userRoute{router, service}
 
 	u.router.POST("/user", u.createUser)

@@ -20,12 +20,12 @@ type S3Servicer interface {
 
 // S3Service holds the S3DocumentRepository
 type S3Service struct {
-	repository *repository.S3DocumentRepository
+	repository repository.S3DocumentRepositorer
 }
 
 // NewS3DocumentService creates a new S3DocumentService
-func NewS3DocumentService(r *repository.MongoRepository) *S3Service {
-	return &S3Service{repository.NewS3DocumentRepository(r)}
+func NewS3DocumentService() *S3Service {
+	return &S3Service{repository.NewS3DocumentRepository()}
 }
 
 // Upload uploads a file

@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"bitbucket.org/hayum/hayum-service/config"
+	"bitbucket.org/hayum/hayum-service/db"
 	"bitbucket.org/hayum/hayum-service/route"
 	"github.com/rs/cors"
 	"github.com/urfave/negroni"
@@ -47,6 +48,8 @@ func initConfig() {
 		dbURL = "localhost"
 		dbName = "hayum"
 	}
+
+	config.App.Set("dbName", dbName)
 }
 
 func initLogger() {
@@ -65,7 +68,12 @@ func main() {
 	initConfig()
 	initLogger()
 
-	router := route.NewRouter(dbURL, dbName)
+	err := db.NewMongoSession(dbURL, dbName)
+	if err != nil {
+		log.Panic(err.Error())
+	}
+
+	router := route.NewRouter()
 
 	middleware := negroni.New()
 	middleware.Use(negroni.NewLogger())

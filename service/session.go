@@ -20,17 +20,17 @@ type SessionServicer interface {
 
 // SessionService holds the SessionRepository
 type SessionService struct {
-	repository         *repository.SessionRepository
+	repository         repository.SessionRepositorer
 	expirationTimeInMS int
 }
 
 // NewSessionService creates a new SessionService
-func NewSessionService(r *repository.MongoRepository) *SessionService {
+func NewSessionService() *SessionService {
 	expirationTimeInMS, err := strconv.Atoi(config.App.GetString("sessionExpirationTimeInMS"))
 	if err != nil {
 		log.Panic("Unable to convert string to int", err)
 	}
-	return &SessionService{repository.NewSessionRepository(r), expirationTimeInMS}
+	return &SessionService{repository.NewSessionRepository(), expirationTimeInMS}
 }
 
 // CreateNewSession creates a new Session

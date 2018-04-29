@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"bitbucket.org/hayum/hayum-service/config"
 	"bitbucket.org/hayum/hayum-service/models"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -17,8 +18,8 @@ type AccountRepository struct {
 }
 
 // NewAccountRepository creates a new AccountRepository
-func NewAccountRepository(r *MongoRepository) *AccountRepository {
-	return &AccountRepository{r}
+func NewAccountRepository() *AccountRepository {
+	return &AccountRepository{NewMongoRepository(config.CollectionAccount)}
 }
 
 // CreateNewAccount creates a new account

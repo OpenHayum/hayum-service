@@ -1,9 +1,15 @@
 package repository
 
 import (
+	"bitbucket.org/hayum/hayum-service/config"
 	"bitbucket.org/hayum/hayum-service/models"
 	"gopkg.in/mgo.v2/bson"
 )
+
+type S3DocumentRepositorer interface {
+	MongoRepositorer
+	CreateNewS3Document(doc *models.S3Document) error
+}
 
 // S3DocumentRepository embeds a Repository
 type S3DocumentRepository struct {
@@ -11,8 +17,8 @@ type S3DocumentRepository struct {
 }
 
 // NewS3DocumentRepository creates a new S3DocumentRepository
-func NewS3DocumentRepository(r *MongoRepository) *S3DocumentRepository {
-	return &S3DocumentRepository{r}
+func NewS3DocumentRepository() *S3DocumentRepository {
+	return &S3DocumentRepository{NewMongoRepository(config.CollectionS3Document)}
 }
 
 // CreateNewS3Document creates a new S3 Document

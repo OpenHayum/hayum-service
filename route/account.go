@@ -8,8 +8,6 @@ import (
 	"bitbucket.org/hayum/hayum-service/models"
 	"github.com/gorilla/schema"
 
-	"bitbucket.org/hayum/hayum-service/config"
-	"bitbucket.org/hayum/hayum-service/repository"
 	"bitbucket.org/hayum/hayum-service/service"
 	"github.com/julienschmidt/httprouter"
 )
@@ -22,8 +20,7 @@ type accountRoute struct {
 var schemaDecoder = schema.NewDecoder()
 
 func initAccountRoute(router Router) {
-	repository := repository.NewMongoRepository(router.GetMongo(), config.CollectionAccount)
-	s := service.NewAccountService(repository)
+	s := service.NewAccountService()
 	a := &accountRoute{router, s}
 
 	a.router.POST("/account", a.createNewAccount)

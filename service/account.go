@@ -20,8 +20,8 @@ type AccountService struct {
 	repository *repository.AccountRepository
 }
 
-func NewAccountService(r *repository.MongoRepository) *AccountService {
-	return &AccountService{repository.NewAccountRepository(r)}
+func NewAccountService() *AccountService {
+	return &AccountService{repository.NewAccountRepository()}
 }
 
 func (s *AccountService) CreateNewAccount(userID string, acc *models.Account) error {
