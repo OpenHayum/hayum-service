@@ -6,12 +6,13 @@ import (
 
 	"bitbucket.org/hayum/hayum-service/models"
 	"bitbucket.org/hayum/hayum-service/models/dto"
+	"bitbucket.org/hayum/hayum-service/util"
 )
 
 // AuthServicer holds the AuthService contracts
 type AuthServicer interface {
 	Register(user *models.User) (error, *dto.AuthRegistrationResponse)
-	// Login(username string, password string) error
+	Login(username string, password string) (error, *models.Session)
 	// Logout(sesssion *models.Session)
 }
 
@@ -19,12 +20,14 @@ type AuthServicer interface {
 type AuthService struct {
 	userService    UserServicer
 	accountService AccountServicer
+	sessionService SessionServicer
 }
 
 func NewAuthService() *AuthService {
 	return &AuthService{
 		NewUserService(),
 		NewAccountService(),
+		NewSessionService(),
 	}
 } //
 
@@ -48,4 +51,19 @@ func (a *AuthService) Register(user *models.User) (error, *dto.AuthRegistrationR
 	}
 
 	return nil, &dto.AuthRegistrationResponse{user.ID.String(), acc.ID.String()}
+}
+
+func (a *AuthService) Login(username string, password string) (error, *models.Session) {
+	user := &models.User{}
+	if err := a.userService.GetUserByUsername(username, user); err != nil {
+		log.Println("Login: Unable to get user with username", username)
+		return err, nil
+	}
+
+	if err := util.CompareHashAndPassword(user.Password, password); err != nil {
+		log.Println("Login: Login failed for user with ID: ", user.ID.String())
+		return err, nil
+	}
+
+	return a.sessionService.CreateNewSession(user.ID.String())
 }

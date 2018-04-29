@@ -2,6 +2,8 @@ package route
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -19,10 +21,11 @@ func initAuthRoute(router Router) {
 
 	a := &authRoute{router, service.NewAuthService()}
 
-	a.router.POST("/account", a.createNewAccount)
+	a.router.POST("/auth/register", a.register)
+	a.router.POST("/auth/login", a.login)
 }
 
-func (a *authRoute) createNewAccount(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (a *authRoute) register(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	schemaDecoder.SetAliasTag("json")
 	var user models.User
 
@@ -38,4 +41,24 @@ func (a *authRoute) createNewAccount(w http.ResponseWriter, r *http.Request, ps 
 	}
 
 	a.router.JSON(w, response)
+}
+
+func (a *authRoute) login(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+
+	if username == "" || password == "" {
+		log.Printf("Username or Password is not provided")
+		http.Error(w, "Username or Password is not provided", http.StatusBadRequest)
+		return
+	}
+
+	err, session := a.s.Login(username, password)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Set-Cookie", fmt.Sprintf("sesssion-id=%s", session.ID.String()))
 }

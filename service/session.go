@@ -13,7 +13,7 @@ import (
 
 // SessionServicer holds the SessionService contracts
 type SessionServicer interface {
-	CreateNewSession(userID string) error
+	CreateNewSession(userID string) (error, *models.Session)
 	DeleteSession(sessionID string) error
 	UpdateSession(sessionID string) error
 }
@@ -34,12 +34,13 @@ func NewSessionService() *SessionService {
 }
 
 // CreateNewSession creates a new Session
-func (s *SessionService) CreateNewSession(userID string) error {
+func (s *SessionService) CreateNewSession(userID string) (error, *models.Session) {
 	session := new(models.Session)
 	session.ID = bson.NewObjectId()
 	session.UserID = userID
 	session.ExpiresAt = time.Now().Local().Add(time.Millisecond * time.Duration(s.expirationTimeInMS))
-	return s.repository.Save(session)
+	err := s.repository.Save(session)
+	return err, session
 }
 
 // DeleteSession deletes a Session

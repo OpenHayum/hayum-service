@@ -11,6 +11,7 @@ type UserRepositorer interface {
 	MongoRepositorer
 	CreateNewUser(user *models.User) error
 	GetUserByID(id string, u *models.User) error
+	GetUserByUsername(username string, u *models.User) error
 	GetUserByEmail(email string) (*models.User, error)
 }
 
@@ -34,6 +35,11 @@ func (r *UserRepository) CreateNewUser(user *models.User) error {
 // GetUserByID gets user by Id
 func (r *UserRepository) GetUserByID(id string, u *models.User) error {
 	return r.GetByID(id, u)
+}
+
+// GetUserByUsername gets user by Username
+func (r *UserRepository) GetUserByUsername(username string, u *models.User) error {
+	return r.collection.Find(bson.M{"username": username}).One(&u)
 }
 
 // GetUserByEmail gets user by email

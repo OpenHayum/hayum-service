@@ -26,6 +26,7 @@ const (
 type UserServicer interface {
 	CreateNewUser(user *models.User) error
 	GetUserByID(id string, user *models.User) error
+	GetUserByUsername(username string, user *models.User) error
 	GetUserByEmail(email string) (*models.User, error)
 	Delete(user *models.User) error
 }
@@ -64,6 +65,11 @@ func (s *UserService) CreateNewUser(user *models.User) error {
 // GetUserByID get User by ID
 func (s *UserService) GetUserByID(id string, u *models.User) error {
 	return s.repository.GetUserByID(id, u)
+}
+
+// GetUserByUsername get User by Username
+func (s *UserService) GetUserByUsername(username string, u *models.User) error {
+	return s.repository.GetUserByUsername(username, u)
 }
 
 // GetUserByEmail gets User by email
