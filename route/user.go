@@ -59,7 +59,7 @@ func (u *userRoute) getUser(w http.ResponseWriter, r *http.Request, ps httproute
 	err := u.service.GetUserByID(ps.ByName("id"), user)
 
 	if err != nil {
-		log.Println("Cannot get user id")
+		log.Println("Cannot get user by id")
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}

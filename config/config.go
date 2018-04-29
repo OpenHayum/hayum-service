@@ -25,6 +25,9 @@ const (
 	// CollectionSession collection name for Session
 	CollectionSession = "sessions"
 
+	// CollectionAccount collection name for Account
+	CollectionAccount = "accounts"
+
 	// ExternalConfigFilePath external config file path
 	ExternalConfigFilePath = "/opt/conf/hayum"
 )

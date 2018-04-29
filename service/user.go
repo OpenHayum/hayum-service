@@ -8,6 +8,20 @@ import (
 	"bitbucket.org/hayum/hayum-service/util"
 )
 
+const (
+	// RoleAdmin can do everything
+	RoleAdmin = "ADMIN"
+
+	// RoleModerator can act as a moderator for uploaded contents
+	RoleModerator = "MODERATOR"
+
+	// RoleUser acts as a normal user
+	RoleUser = "USER"
+
+	// RoleArtist will have privileges of an artist
+	RoleArtist = "ARTIST"
+)
+
 // UserServicer exposes methods which can be perform
 type UserServicer interface {
 	CreateNewUser(user *models.User) error
