@@ -26,13 +26,16 @@ func initSessionRoute(router Router) {
 
 func (s *sessionRoute) createSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userID := r.Header.Get("user-id")
+	err, session := s.service.CreateNewSession(userID)
 
-	if err := s.service.CreateNewSession(userID); err != nil {
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	s.router.Send(w, "Session created")
+	log.Printf("createSession: Session created for userID: %s with sessionID: %s", userID, session.ID.String())
+
+	s.router.JSON(w, session)
 }
 
 func (s *sessionRoute) updateSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
