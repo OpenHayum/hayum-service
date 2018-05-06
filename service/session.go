@@ -16,6 +16,7 @@ type SessionServicer interface {
 	CreateNewSession(userID string) (error, *models.Session)
 	DeleteSession(sessionID string) error
 	UpdateSession(sessionID string) error
+	GetSessionByID(sessionID string, session *models.Session) error
 }
 
 // SessionService holds the SessionRepository
@@ -57,4 +58,9 @@ func (s *SessionService) UpdateSession(sessionID string) error {
 	}
 	session.ExpiresAt = time.Now().Local().Add(time.Millisecond * time.Duration(s.expirationTimeInMS))
 	return s.repository.Save(session)
+}
+
+// GetSessionByID get session by ID
+func (s *SessionService) GetSessionByID(sessionID string, session *models.Session) error {
+	return s.repository.GetByID(sessionID, session)
 }
