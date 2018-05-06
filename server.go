@@ -8,6 +8,7 @@ import (
 
 	"bitbucket.org/hayum/hayum-service/config"
 	"bitbucket.org/hayum/hayum-service/db"
+	hayumMiddleware "bitbucket.org/hayum/hayum-service/middleware"
 	"bitbucket.org/hayum/hayum-service/route"
 	"github.com/rs/cors"
 	"github.com/urfave/negroni"
@@ -67,6 +68,7 @@ func initLogger() {
 func main() {
 	initConfig()
 	initLogger()
+	hayumMiddleware.InitMiddlewareServices()
 
 	err := db.NewMongoSession(dbURL, dbName)
 	if err != nil {
@@ -78,6 +80,7 @@ func main() {
 	middleware := negroni.New()
 	middleware.Use(negroni.NewLogger())
 	middleware.UseHandler(router.GetRouter())
+	middleware.UseHandlerFunc(hayumMiddleware.Authorize)
 
 	log.Println("Listening on port:", port)
 
