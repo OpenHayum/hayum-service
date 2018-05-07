@@ -13,7 +13,7 @@ import (
 type AuthServicer interface {
 	Register(user *models.User) (error, *dto.AuthRegistrationResponse)
 	Login(username string, password string) (error, *models.Session)
-	// Logout(sesssion *models.Session)
+	Logout(sessionID string) error
 }
 
 // AuthService holds the UserRepository
@@ -23,14 +23,16 @@ type AuthService struct {
 	sessionService SessionServicer
 }
 
+// NewAuthService creates a new AuthService
 func NewAuthService() *AuthService {
 	return &AuthService{
 		NewUserService(),
 		NewAccountService(),
 		NewSessionService(),
 	}
-} //
+}
 
+// Register handles user registration
 func (a *AuthService) Register(user *models.User) (error, *dto.AuthRegistrationResponse) {
 	acc := &models.Account{}
 	err := a.userService.CreateNewUser(user)
@@ -53,6 +55,7 @@ func (a *AuthService) Register(user *models.User) (error, *dto.AuthRegistrationR
 	return nil, &dto.AuthRegistrationResponse{user.ID.String(), acc.ID.String()}
 }
 
+// Login handles user login
 func (a *AuthService) Login(username string, password string) (error, *models.Session) {
 	user := &models.User{}
 	if err := a.userService.GetUserByUsername(username, user); err != nil {

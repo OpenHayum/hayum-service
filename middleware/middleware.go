@@ -18,20 +18,33 @@ func InitMiddlewareServices() {
 	}
 }
 
+func getCookieValue(r *http.Request, name string) string {
+	cookie, err := r.Cookie(name)
+	if err != nil {
+		log.Println("getCookieValue: Unable to read cookie with name: ", name, err)
+		return ""
+	}
+	return cookie.Value
+}
+
 // Authorize check for session
 // TODO: manage a .yaml file for routes that requires authentication
 // such as Artist visiting his/her profile should show a different view than
 // a normal user visiting someone else'e profile
 // TODO: shift session management to redis
 func Authorize(rw http.ResponseWriter, r *http.Request) {
-	sessionIDCookie, err := r.Cookie("session-id")
-	userIDCookie, _ := r.Cookie("user-id")
-	if err != nil {
-		log.Println("Authorize: Unable to read cookie", err)
-	}
-	sessionID := sessionIDCookie.Value
-	userID := userIDCookie.Value
+	sessionID := getCookieValue(r, "session-id")
+	userID := getCookieValue(r, "user-id")
 	session := new(models.Session)
+
+	if sessionID == "" {
+		// TODO: if there is no `session-id` present in cookie
+		// check if route requires authentication and redirect to login
+		// else just let it through without blocking
+	}
+
+	// TODO: check for expired sessions, delete session if it is expired
+	// and redirect to login
 
 	if err := sessionService.GetSessionByID(sessionID, session); err != nil {
 		log.Printf("Authorize: Unable to get session by ID: %s", sessionID)
