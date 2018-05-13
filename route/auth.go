@@ -10,6 +10,7 @@ import (
 
 	"bitbucket.org/hayum/hayum-service/models"
 	"bitbucket.org/hayum/hayum-service/service"
+	"bitbucket.org/hayum/hayum-service/util"
 )
 
 type authRoute struct {
@@ -23,6 +24,7 @@ func initAuthRoute(router Router) {
 
 	a.router.POST("/auth/register", a.register)
 	a.router.POST("/auth/login", a.login)
+	a.router.POST("/auth/logout", a.logout)
 }
 
 func (a *authRoute) register(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -61,4 +63,15 @@ func (a *authRoute) login(w http.ResponseWriter, r *http.Request, ps httprouter.
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Set-Cookie", fmt.Sprintf("sesssion-id=%s", session.ID.String()))
+}
+
+func (a *authRoute) logout(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	sessionID := util.GetCookieValue(r, "session-id")
+
+	if err := a.s.Logout(sessionID); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	a.router.JSON(w, "")
 }

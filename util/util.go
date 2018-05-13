@@ -1,7 +1,9 @@
 package util
 
 import (
+	"log"
 	"math/rand"
+	"net/http"
 	"path"
 
 	"golang.org/x/crypto/bcrypt"
@@ -38,4 +40,14 @@ func CompareHashAndPassword(hashedPassword, password string) error {
 	bytePassword := []byte(password)
 
 	return bcrypt.CompareHashAndPassword(byteHashedPassword, bytePassword)
+}
+
+// GetCookieValue extracts cookie value by name
+func GetCookieValue(r *http.Request, name string) string {
+	cookie, err := r.Cookie(name)
+	if err != nil {
+		log.Println("getCookieValue: Unable to read cookie with name: ", name, err)
+		return ""
+	}
+	return cookie.Value
 }

@@ -70,3 +70,13 @@ func (a *AuthService) Login(username string, password string) (error, *models.Se
 
 	return a.sessionService.CreateNewSession(user.ID.String())
 }
+
+// Logout handles user logout
+func (a *AuthService) Logout(sessionID string) error {
+	if err := a.sessionService.DeleteSession(sessionID); err != nil {
+		log.Println("Login: Unable to delete session with ID: ", sessionID)
+		return err
+	}
+
+	return nil
+}

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"bitbucket.org/hayum/hayum-service/models"
+	"bitbucket.org/hayum/hayum-service/util"
 
 	"bitbucket.org/hayum/hayum-service/service"
 )
@@ -18,23 +19,14 @@ func InitMiddlewareServices() {
 	}
 }
 
-func getCookieValue(r *http.Request, name string) string {
-	cookie, err := r.Cookie(name)
-	if err != nil {
-		log.Println("getCookieValue: Unable to read cookie with name: ", name, err)
-		return ""
-	}
-	return cookie.Value
-}
-
 // Authorize check for session
 // TODO: manage a .yaml file for routes that requires authentication
 // such as Artist visiting his/her profile should show a different view than
 // a normal user visiting someone else'e profile
 // TODO: shift session management to redis
 func Authorize(rw http.ResponseWriter, r *http.Request) {
-	sessionID := getCookieValue(r, "session-id")
-	userID := getCookieValue(r, "user-id")
+	sessionID := util.GetCookieValue(r, "session-id")
+	userID := util.GetCookieValue(r, "user-id")
 	session := new(models.Session)
 
 	if sessionID == "" {
