@@ -5,6 +5,7 @@ logpath: /var/log/hayum/log.txt
 db:
   dev:
     url: localhost
+    port: 27017
     name: hayum
   test:
     name: test_hayum

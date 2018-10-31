@@ -15,9 +15,10 @@ import (
 )
 
 const (
-	devEnv  = "dev"
-	prodEnv = "prod"
-	testEnv = "test"
+	devEnv     = "development"
+	prodEnv    = "production"
+	stagingEnv = "staging"
+	testEnv    = "test"
 )
 
 var dbName, dbURL, port string
@@ -72,6 +73,7 @@ func main() {
 
 	err := db.NewMongoSession(dbURL, dbName)
 	if err != nil {
+		log.Println("Unable to connect to mongo")
 		log.Panic(err.Error())
 	}
 
