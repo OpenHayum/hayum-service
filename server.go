@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -10,6 +9,7 @@ import (
 	"bitbucket.org/hayum/hayum-service/db"
 	hayumMiddleware "bitbucket.org/hayum/hayum-service/middleware"
 	"bitbucket.org/hayum/hayum-service/route"
+	"bitbucket.org/hayum/hayum-service/util"
 	"github.com/rs/cors"
 	"github.com/urfave/negroni"
 )
@@ -54,21 +54,9 @@ func initConfig() {
 	config.App.Set("dbName", dbName)
 }
 
-func initLogger() {
-	logpath := config.App.GetString("logpath")
-	f, err := os.OpenFile(logpath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	if err != nil {
-		log.Panic(err)
-	}
-	defer f.Close()
-	mw := io.MultiWriter(os.Stdout, f)
-	log.SetOutput(mw)
-	log.Printf("Using log path: %s\n", logpath)
-}
-
 func main() {
 	initConfig()
-	initLogger()
+	util.InitLogger()
 
 	err := db.NewMongoSession(dbURL, dbName)
 
