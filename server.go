@@ -69,9 +69,11 @@ func initLogger() {
 func main() {
 	initConfig()
 	initLogger()
-	hayumMiddleware.InitMiddlewareServices()
 
 	err := db.NewMongoSession(dbURL, dbName)
+
+	hayumMiddleware.InitMiddlewareServices()
+
 	if err != nil {
 		log.Println("Unable to connect to mongo")
 		log.Panic(err.Error())
