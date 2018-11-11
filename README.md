@@ -1,7 +1,11 @@
 # hayum-service
-*[hayum.in](http://alpha-v2.hayum.in/music)*
+Backend service for *[hayum.in](http://alpha-v2.hayum.in/music)*
   
-Backend for hayum. It was written using `Nodejs` but I have decided to use `Golang` instead.
-It is much more fun to implement in `Golang` with the advantages of a compiled, static typed language and low memory footprint.
+This `mirror` version is pushed to  *[staging.hayum.in](http://staging.hayum.in)*
+
+## Demo:  
+<img src="public/demo/hayum_demo.gif" width="800" height="440"/>
+
+Corresponding frontend app: [https://github.com/OpenHayum/hayum-frontend](https://github.com/OpenHayum/hayum-frontend)
 
 `Note: This repo is just a mirror. Actual development happens on Bitbucket.`
