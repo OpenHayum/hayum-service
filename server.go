@@ -1,19 +1,28 @@
 package main
 
 import (
+	"context"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"hayum/core_apis/schema"
 	"log"
+	"time"
 )
 
 func main() {
-	db, err := sqlx.Connect("mysql", "root:devmysql@/hayum?multiStatements=true")
+	ctx := context.Background()
+
+	// Set timeout for 2 sec to connect to the database
+	ctx, cancel := context.WithTimeout(ctx, time.Second*2)
+	defer cancel()
+
+	db, err := sqlx.ConnectContext(ctx, "mysql", "root:devmysql@/hayum?multiStatements=true")
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	//ctx := context.Background()
+	ctx, cancel = context.WithCancel(ctx)
+	time.AfterFunc(time.Second, cancel)
 
-	db.MustExec(schema.DDL)
+	db.MustExecContext(ctx, schema.DDL)
 }
