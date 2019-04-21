@@ -24,7 +24,7 @@ func main() {
 
 	conn := db.OpenContext(ctx, cfg)
 
-	router := route.NewRouter(conn)
+	router := route.NewRouter(&db.Conn{DB: conn})
 
 	// setup middleware
 	middleware := negroni.New()
