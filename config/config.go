@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"hayum/core_apis/logger"
 	"log"
 	"os"
 
@@ -43,7 +44,7 @@ func getConfigFilename(env string) string {
 
 func New() *viper.Viper {
 	env := os.Getenv("GO_ENV")
-	log.Println("GO_ENV:", env)
+	logger.Log.Info("GO_ENV:", env)
 
 	internalConfig := newDetail("config", getConfigFilename(env))
 	externalConfig := newDetail(externalConfigPath, getConfigFilename(env))

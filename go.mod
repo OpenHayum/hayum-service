@@ -13,6 +13,9 @@ require (
 	github.com/rs/cors v1.6.0
 	github.com/spf13/viper v1.3.2
 	github.com/urfave/negroni v1.0.0
+	go.uber.org/atomic v1.3.2 // indirect
+	go.uber.org/multierr v1.1.0 // indirect
+	go.uber.org/zap v1.9.1
 	golang.org/x/crypto v0.0.0-20190418165655-df01cb2cc480
 	gopkg.in/guregu/null.v3 v3.4.0
 	gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce // indirect

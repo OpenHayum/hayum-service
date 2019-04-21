@@ -7,13 +7,14 @@ import (
 	"github.com/urfave/negroni"
 	"hayum/core_apis/config"
 	"hayum/core_apis/db"
+	"hayum/core_apis/logger"
 	"hayum/core_apis/routes"
-	"log"
 	"net/http"
 	"time"
 )
 
 func main() {
+	logger.Init()
 	cfg := config.New()
 	ctx := context.Background()
 
@@ -33,6 +34,7 @@ func main() {
 	handler := cors.Default().Handler(middleware)
 	port := cfg.GetString("port")
 
-	log.Println("Listening on port:", port)
-	log.Panic(http.ListenAndServe(port, handler))
+	logger.Log.Info("Listening on port:", port)
+
+	logger.Log.Panic(http.ListenAndServe(port, handler))
 }

@@ -12,6 +12,7 @@ type User struct {
 	LastName     string
 	Mobile       string
 	Password     string
+	Otp          int
 	IsDeleted    int
 	IsVerified   int
 	OtpExpiresAt null.Time
