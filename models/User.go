@@ -1,18 +1,21 @@
 package models
 
-import "time"
+import (
+	"gopkg.in/guregu/null.v3"
+	"time"
+)
 
 type User struct {
-	CreatedDate  time.Time
-	DeletedDate  time.Time
+	Id           int
 	Email        string
 	FirstName    string
-	ID           int
-	IsDeleted    int
-	IsVerified   int
 	LastName     string
 	Mobile       string
-	ModifiedDate time.Time
-	OtpExpiresAt time.Time
 	Password     string
+	IsDeleted    int
+	IsVerified   int
+	OtpExpiresAt null.Time
+	CreatedDate  time.Time
+	DeletedDate  null.Time
+	ModifiedDate null.Time
 }

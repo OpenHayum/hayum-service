@@ -6,6 +6,8 @@ import (
 	"github.com/rs/cors"
 	"github.com/urfave/negroni"
 	"hayum/core_apis/config"
+	"hayum/core_apis/db"
+	"hayum/core_apis/routes"
 	"log"
 	"net/http"
 	"time"
@@ -13,17 +15,19 @@ import (
 
 func main() {
 	cfg := config.New()
-
 	ctx := context.Background()
 
 	// Set timeout for 2 sec to connect to the database
 	ctx, cancel := context.WithTimeout(ctx, time.Second*2)
 	defer cancel()
 
-	dbOpenContext(ctx, cfg)
+	conn := db.OpenContext(ctx, cfg)
+
+	router := route.NewRouter(conn)
 
 	// setup middleware
 	middleware := negroni.New()
+	middleware.UseHandler(router.GetRouter())
 	middleware.Use(negroni.NewLogger())
 
 	handler := cors.Default().Handler(middleware)
@@ -31,5 +35,4 @@ func main() {
 
 	log.Println("Listening on port:", port)
 	log.Panic(http.ListenAndServe(port, handler))
-
 }

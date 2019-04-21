@@ -1,6 +1,6 @@
-package schema
+package db
 
-const DDL = `
+const createDDL = `
 -- ************************************** User
 
 CREATE TABLE IF NOT EXISTS User
@@ -11,12 +11,12 @@ CREATE TABLE IF NOT EXISTS User
 	Mobile       VARCHAR(10) NOT NULL ,
 	Password     VARCHAR(256) NOT NULL ,
 	Email        VARCHAR(45) NOT NULL ,
-	IsVerified   TINYINT NOT NULL ,
-	IsDeleted    TINYINT NOT NULL ,
-	OtpExpiresAt DATETIME NOT NULL ,
+	IsVerified   TINYINT NOT NULL DEFAULT 0,
+	IsDeleted    TINYINT NOT NULL DEFAULT 0,
+	OtpExpiresAt DATETIME,
 	CreatedDate  DATETIME NOT NULL ,
-	ModifiedDate DATETIME NOT NULL ,
-	DeletedDate  DATETIME NOT NULL 
+	ModifiedDate DATETIME,
+	DeletedDate  DATETIME 
 );
 
 -- ************************************** Artist

@@ -1,25 +1,29 @@
-package main
+package db
 
 import (
 	"context"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/viper"
-	"hayum/core_apis/schema"
 	"log"
 	"time"
 )
+
+type Conn struct {
+	*sqlx.DB
+}
 
 func getDSN(cfg *viper.Viper) string {
 	user := cfg.GetString("db.user")
 	password := cfg.GetString("db.password")
 	db := cfg.GetString("db.name")
 
-	return fmt.Sprintf("%s:%s@/%s?multiStatements=true", user, password, db)
+	return fmt.Sprintf("%s:%s@/%s?multiStatements=true&parseTime=true", user, password, db)
 }
 
-func dbOpenContext(ctx context.Context, cfg *viper.Viper) *sqlx.DB {
+func OpenContext(ctx context.Context, cfg *viper.Viper) *Conn {
 	// connect to database
+	sqlx.NameMapper = func(s string) string { return s }
 	db, err := sqlx.ConnectContext(ctx, "mysql", getDSN(cfg))
 	if err != nil {
 		log.Fatalln(err)
@@ -29,7 +33,7 @@ func dbOpenContext(ctx context.Context, cfg *viper.Viper) *sqlx.DB {
 	time.AfterFunc(time.Second, cancel)
 
 	// create mysql tables
-	db.MustExecContext(ctx, schema.DDL)
+	db.MustExecContext(ctx, createDDL)
 
-	return db
+	return &Conn{db}
 }
