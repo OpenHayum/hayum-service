@@ -21,7 +21,7 @@ func getDSN(cfg *viper.Viper) string {
 	return fmt.Sprintf("%s:%s@/%s?multiStatements=true&parseTime=true", user, password, db)
 }
 
-func OpenContext(ctx context.Context, cfg *viper.Viper) *Conn {
+func OpenContext(ctx context.Context, cfg *viper.Viper) *sqlx.DB {
 	// connect to database
 	sqlx.NameMapper = func(s string) string { return s }
 	db, err := sqlx.ConnectContext(ctx, "mysql", getDSN(cfg))
@@ -35,5 +35,5 @@ func OpenContext(ctx context.Context, cfg *viper.Viper) *Conn {
 	// create mysql tables
 	db.MustExecContext(ctx, createDDL)
 
-	return &Conn{db}
+	return db
 }
