@@ -1,12 +1,12 @@
 package util
 
 import (
+	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"math/rand"
 	"net/http"
 	"path"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 // ConstructEndpoint constructs API endpoint
@@ -50,4 +50,9 @@ func GetCookieValue(r *http.Request, name string) string {
 		return ""
 	}
 	return cookie.Value
+}
+
+// GetRandID generate random string
+func GetRandID() string {
+	return uuid.New().String()
 }

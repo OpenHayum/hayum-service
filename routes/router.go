@@ -3,6 +3,7 @@ package route
 import (
 	"encoding/json"
 	"hayum/core_apis/db"
+	"hayum/core_apis/logger"
 	"hayum/core_apis/util"
 	"net/http"
 
@@ -18,6 +19,7 @@ type Router interface {
 	DELETE(path string, handle httprouter.Handle)
 	Send(w http.ResponseWriter, response interface{})
 	JSON(w http.ResponseWriter, response interface{})
+	JSONWithStatus(w http.ResponseWriter, status int, response interface{})
 	GetRouter() *httprouter.Router
 	GetConn() *db.Conn
 }
@@ -54,19 +56,28 @@ func (hr *hayumRouter) GetConn() *db.Conn {
 }
 
 func (hr *hayumRouter) Send(w http.ResponseWriter, response interface{}) {
-	json.NewEncoder(w).Encode(response)
+	err := json.NewEncoder(w).Encode(response)
+	if err != nil {
+		logger.Log.Fatal(err)
+	}
 }
 
 func (hr *hayumRouter) JSON(w http.ResponseWriter, response interface{}) {
-	w.Header().Add("Content-Type", "application/json")
+	hr.JSONWithStatus(w, http.StatusOK, response)
+}
+
+func (hr *hayumRouter) JSONWithStatus(w http.ResponseWriter, status int, response interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
 	hr.Send(w, response)
 }
 
 // NewRouter initializes all routes of the service
 func NewRouter(conn *db.Conn) Router {
 	router := NewHayumRouter(util.ConstructEndpoint(apiVersion1, "/"), conn)
+
 	initUserRoute(router)
-	//initS3Route(router)
+	initSessionRoute(router)
 
 	return router
 }
