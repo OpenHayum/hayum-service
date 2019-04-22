@@ -3,35 +3,29 @@ package route
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/schema"
 	"github.com/julienschmidt/httprouter"
 	"hayum/core_apis/logger"
 	"hayum/core_apis/models"
-	"hayum/core_apis/repository"
 	"hayum/core_apis/service"
 	"log"
 	"net/http"
 	"strconv"
 )
 
-var schemaDecoder = schema.NewDecoder()
-
-type userRoute struct {
+type authRoute struct {
 	router  Router
-	service service.UserService
+	service service.AuthService
 }
 
-func initUserRoute(router Router) {
-	userRepo := repository.NewSQLUserRepository(router.GetConn())
+func initAuthRoute(router Router) {
+	authService := service.NewAuthService(router.GetConn())
+	u := &authRoute{router, authService}
 
-	userService := service.NewUserService(userRepo)
-	u := &userRoute{router, userService}
-
-	u.router.POST("/user", u.createUser)
-	u.router.GET("/user/:id", u.getUser)
+	u.router.POST("/login", u.register)
+	u.router.GET("/register", u.login)
 }
 
-func (u *userRoute) createUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (u *authRoute) register(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	schemaDecoder.SetAliasTag("json")
 	var user models.User
 
@@ -57,7 +51,7 @@ func (u *userRoute) createUser(w http.ResponseWriter, r *http.Request, ps httpro
 	u.router.JSON(w, user)
 }
 
-func (u *userRoute) getUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (u *authRoute) login(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ctx := r.Context()
 	id, err := strconv.Atoi(ps.ByName("id"))
 
