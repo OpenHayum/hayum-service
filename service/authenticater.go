@@ -20,25 +20,27 @@ type HayumAuthenticater interface {
 }
 
 type hayumAuthenticater struct {
-	next Authenticater
+	auth Authenticater
+	next *hayumAuthenticater
 }
 
 func newHayumAuthenticater(a Authenticater) *hayumAuthenticater {
-	return &hayumAuthenticater{a}
+	return &hayumAuthenticater{a, nil}
 }
 
 func (ha *hayumAuthenticater) Add(a Authenticater) {
-	ha.next = a
+	ha.next = &hayumAuthenticater{a, nil}
 }
 
 func (ha *hayumAuthenticater) Authenticate(identifier string, password string) bool {
-	curr := ha.next
+	curr := ha
 
 	for curr != nil {
-		isAuthenticated := curr.authenticate(identifier, password)
+		isAuthenticated := curr.next.auth.authenticate(identifier, password)
 		if isAuthenticated {
 			return true
 		}
+		curr = curr.next
 	}
 
 	return false
