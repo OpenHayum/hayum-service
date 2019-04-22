@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gorilla/schema"
 	"github.com/julienschmidt/httprouter"
+	"hayum/core_apis/logger"
 	"hayum/core_apis/models"
 	"hayum/core_apis/repository"
 	"hayum/core_apis/service"
@@ -46,12 +47,13 @@ func (u *userRoute) createUser(w http.ResponseWriter, r *http.Request, ps httpro
 	//	return
 	//}
 
-	if err := u.service.Create(ctx, &user); err != nil {
+	if err := u.service.Save(ctx, &user); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
+	w.Header().Set("Content-Type", "application/json")
 	u.router.JSON(w, user)
 }
 
@@ -60,11 +62,12 @@ func (u *userRoute) getUser(w http.ResponseWriter, r *http.Request, ps httproute
 	id, err := strconv.Atoi(ps.ByName("id"))
 
 	if err != nil {
+		logger.Log.Error(err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	user, err := u.service.FindByID(ctx, id)
+	user, err := u.service.GetByID(ctx, id)
 
 	if err != nil {
 		log.Println(err)

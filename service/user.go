@@ -9,8 +9,10 @@ import (
 )
 
 type UserService interface {
-	Create(ctx context.Context, u *models.User) error
-	FindByID(ctx context.Context, id int) (*models.User, error)
+	Save(ctx context.Context, u *models.User) error
+	GetByID(ctx context.Context, id int) (*models.User, error)
+	GetByEmail(ctx context.Context, email string) (*models.User, error)
+	GetByMobile(ctx context.Context, mobile string) (*models.User, error)
 }
 
 type userService struct {
@@ -21,7 +23,7 @@ func NewUserService(repo repository.UserRepository) *userService {
 	return &userService{repo}
 }
 
-func (s *userService) Create(ctx context.Context, u *models.User) error {
+func (s *userService) Save(ctx context.Context, u *models.User) error {
 	u.CreatedDate = time.Now()
 	password, err := util.EncryptPassword(u.Password)
 	if err != nil {
@@ -31,6 +33,14 @@ func (s *userService) Create(ctx context.Context, u *models.User) error {
 	return s.repo.Save(ctx, u)
 }
 
-func (s *userService) FindByID(ctx context.Context, id int) (*models.User, error) {
+func (s *userService) GetByID(ctx context.Context, id int) (*models.User, error) {
 	return s.repo.GetByID(ctx, id)
+}
+
+func (s *userService) GetByEmail(ctx context.Context, email string) (*models.User, error) {
+	return s.repo.GetByEmail(ctx, email)
+}
+
+func (s *userService) GetByMobile(ctx context.Context, mobile string) (*models.User, error) {
+	return s.repo.GetByMobile(ctx, mobile)
 }
