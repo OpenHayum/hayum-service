@@ -36,7 +36,7 @@ func (ha *hayumAuthenticater) Authenticate(identifier string, password string) b
 	curr := ha
 
 	for curr != nil {
-		isAuthenticated := curr.next.auth.authenticate(identifier, password)
+		isAuthenticated := curr.auth.authenticate(identifier, password)
 		if isAuthenticated {
 			return true
 		}
