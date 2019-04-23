@@ -10,7 +10,7 @@ import (
 )
 
 type AuthService interface {
-	Login(ctx context.Context, identifier string, password string) (*models.Session, error)
+	Login(ctx context.Context, identifier string, password string, user *models.User) (*models.Session, error)
 	Register(ctx context.Context, user *models.User) error
 }
 
@@ -29,15 +29,13 @@ func NewAuthService(conn *db.Conn) *authService {
 	return &authService{userService, sessionService}
 }
 
-func (a *authService) Login(ctx context.Context, identifier string, password string) (*models.Session, error) {
+func (a *authService) Login(ctx context.Context, identifier string, password string, user *models.User) (*models.Session, error) {
 	emailAuth := newEmailAuthenticater(a.userService, ctx)
 	mobileAuth := newMobileAuthenticater(a.userService, ctx)
 
 	var hyAuth HayumAuthenticater
 	hyAuth = newHayumAuthenticater(emailAuth)
 	hyAuth.Add(mobileAuth)
-
-	user := &models.User{}
 
 	if !hyAuth.Authenticate(identifier, password, user) {
 		logger.Log.Error("Failed to authenticate")
