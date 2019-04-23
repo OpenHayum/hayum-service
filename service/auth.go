@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/pkg/errors"
 	"hayum/core_apis/db"
 	"hayum/core_apis/logger"
 	"hayum/core_apis/models"
@@ -36,18 +37,25 @@ func (a *authService) Login(ctx context.Context, identifier string, password str
 	hyAuth = newHayumAuthenticater(emailAuth)
 	hyAuth.Add(mobileAuth)
 
-	if hyAuth.Authenticate(identifier, password) {
-		logger.Log.Info("Successfully authenticated with identifier:", identifier)
+	user := &models.User{}
+
+	if !hyAuth.Authenticate(identifier, password, user) {
+		logger.Log.Error("Failed to authenticate")
+		err := errors.New("Failed to authenticate")
+		return nil, err
 	}
 
-	session := &models.Session{}
+	logger.Log.Infof("Successfully authenticated with identifier:%s, userId: %d", identifier, user.Id)
+
+	session := &models.Session{UserID: user.Id}
 	if err := a.sessionService.Save(ctx, session); err != nil {
 		logger.Log.Error(err)
 		return nil, err
 	}
+
 	return session, nil
 }
 
-func (a *authService) Register() error {
+func (a *authService) Register(ctx context.Context, user *models.User) error {
 	panic("Implement me")
 }

@@ -52,9 +52,7 @@ func (u *userRoute) createUser(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	w.Header().Set("Content-Type", "application/json")
-	u.router.JSON(w, user)
+	u.router.JSONWithStatus(w, http.StatusCreated, user)
 }
 
 func (u *userRoute) getUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

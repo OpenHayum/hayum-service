@@ -78,6 +78,7 @@ func NewRouter(conn *db.Conn) Router {
 
 	initUserRoute(router)
 	initSessionRoute(router)
+	initAuthRoute(router)
 
 	return router
 }

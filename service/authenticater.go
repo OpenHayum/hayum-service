@@ -11,12 +11,12 @@ import (
 type Authenticater interface {
 	// identifier can be one of [`Email`, `Mobile`]
 	// TODO: support username
-	authenticate(identifier string, password string) bool
+	authenticate(identifier string, password string, user *models.User) bool
 }
 
 type HayumAuthenticater interface {
 	Add(a Authenticater)
-	Authenticate(identifier string, password string) bool
+	Authenticate(identifier string, password string, user *models.User) bool
 }
 
 type hayumAuthenticater struct {
@@ -32,11 +32,11 @@ func (ha *hayumAuthenticater) Add(a Authenticater) {
 	ha.next = &hayumAuthenticater{a, nil}
 }
 
-func (ha *hayumAuthenticater) Authenticate(identifier string, password string) bool {
+func (ha *hayumAuthenticater) Authenticate(identifier string, password string, user *models.User) bool {
 	curr := ha
 
 	for curr != nil {
-		isAuthenticated := curr.auth.authenticate(identifier, password)
+		isAuthenticated := curr.auth.authenticate(identifier, password, user)
 		if isAuthenticated {
 			return true
 		}
@@ -56,27 +56,26 @@ type mobileAuthenticater struct {
 	ctx context.Context
 }
 
+type usernameAuthenticater struct {
+	s   UserService
+	ctx context.Context
+}
+
 func newEmailAuthenticater(s UserService, ctx context.Context) *emailAuthenticater {
 	return &emailAuthenticater{s, ctx}
 }
 
 func isPasswordEqual(passwordFromInput string, storedHashedPassword string) bool {
-	hashedPass, err := util.EncryptPassword(passwordFromInput)
-	if err != nil {
-		logger.Log.Error(err)
-		return false
-	}
-
-	return util.CompareHashAndPassword(storedHashedPassword, hashedPass) == nil
+	return util.CompareHashAndPassword(storedHashedPassword, passwordFromInput) == nil
 }
 
-func (e *emailAuthenticater) authenticate(email string, password string) bool {
-	user, err := e.s.GetByEmail(e.ctx, email)
-
+func (e *emailAuthenticater) authenticate(email string, password string, user *models.User) bool {
+	u, err := e.s.GetByEmail(e.ctx, email)
 	if err != nil || (user == &models.User{}) {
 		logger.Log.Error(err)
 		return false
 	}
+	*user = *u
 
 	return isPasswordEqual(password, user.Password)
 }
@@ -85,12 +84,17 @@ func newMobileAuthenticater(s UserService, ctx context.Context) *mobileAuthentic
 	return &mobileAuthenticater{s, ctx}
 }
 
-func (e *mobileAuthenticater) authenticate(mobile string, password string) bool {
-	user, err := e.s.GetByMobile(e.ctx, mobile)
+func (e *mobileAuthenticater) authenticate(mobile string, password string, user *models.User) bool {
+	u, err := e.s.GetByMobile(e.ctx, mobile)
 	if err != nil || (user == &models.User{}) {
 		logger.Log.Error(err)
 		return false
 	}
+	*user = *u
 
 	return isPasswordEqual(password, user.Password)
+}
+
+func newUsernameAuthenticater(s UserService, ctx context.Context) *usernameAuthenticater {
+	return &usernameAuthenticater{s, ctx}
 }

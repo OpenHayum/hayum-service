@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"hayum/core_apis/logger"
 	"hayum/core_apis/models"
 	"hayum/core_apis/repository"
 	"hayum/core_apis/util"
@@ -29,6 +30,7 @@ func (s *userService) Save(ctx context.Context, u *models.User) error {
 	if err != nil {
 		return err
 	}
+	logger.Log.Info("Hashed Password:", password)
 	u.Password = password
 	return s.repo.Save(ctx, u)
 }
