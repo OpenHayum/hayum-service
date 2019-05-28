@@ -5,8 +5,9 @@ services:
     container_name: hayum_core
     build:
       context: .
+      dockerfile: ./deployments/Dockerfile
       args:
-        ENV: test
+        ENV: development
     image: hayum:latest
     ports:
       - 8080:8080
@@ -14,10 +15,10 @@ services:
     networks:
       - integration-tests
   mysql:
-    container_name: mysql_test
+    container_name: mysql_dev
     image: mysql:5.7
     environment:
-      - MYSQL_DATABASE=hayum_test
+      - MYSQL_DATABASE=hayum_dev
       - MYSQL_ROOT_PASSWORD=devmysql
     ports:
       - 3306:3306

@@ -1,13 +1,21 @@
 ARG GOLANG_VERSION="latest"
+
 FROM golang:${GOLANG_VERSION}
 
 ARG ENV="development"
 ENV GO_ENV=${ENV}
+
 LABEL maintainer="Devajit Asem"
+
 WORKDIR $GOPATH/src/hayum/core_apis
+
 COPY . .
-RUN go get -d ./...
-RUN go install ./...
+
+# Get dependencies
+RUN go get -d ./cmd/hayum...
+# Build hayum
+RUN go install ./cmd/hayum
+
 EXPOSE 8080
 
-CMD ["core_apis"]
+CMD ["hayum"]
