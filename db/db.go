@@ -7,6 +7,7 @@ import (
 	"log"
 	"time"
 
+	_ "github.com/go-sql-driver/mysql" // SQL connect context requires mysql dialect
 	"github.com/jmoiron/sqlx"
 	"github.com/spf13/viper"
 )

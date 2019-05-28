@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/rs/cors"
 	"github.com/urfave/negroni"
 )

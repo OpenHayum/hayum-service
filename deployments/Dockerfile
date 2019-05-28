@@ -12,7 +12,7 @@ WORKDIR $GOPATH/src/hayum/core_apis
 COPY . .
 
 # Get dependencies
-RUN go get -d ./cmd/hayum...
+RUN GO111MODULE=on go get -d ./cmd/hayum...
 # Build hayum
 RUN go install ./cmd/hayum
 

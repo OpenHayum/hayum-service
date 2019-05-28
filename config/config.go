@@ -46,7 +46,7 @@ func New() *viper.Viper {
 	env := os.Getenv("GO_ENV")
 	logger.Log.Info("GO_ENV:", env)
 
-	internalConfig := newDetail("config", getConfigFilename(env))
+	internalConfig := newDetail(os.Getenv("GOPATH")+"/src/hayum/core_apis/config", getConfigFilename(env))
 	externalConfig := newDetail(externalConfigPath, getConfigFilename(env))
 	v, err := newConfig(internalConfig, externalConfig)
 

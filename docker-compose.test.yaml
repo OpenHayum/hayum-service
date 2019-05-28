@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  hayum:
+    container_name: hayum_core_test
+    build:
+      context: .
+      dockerfile: ./deployments/Dockerfile.test
+    image: hayum_test:latest
+    volumes:
+      - $PWD:/go/src/hayum/core_apis
+    ports:
+      - 8080:8080
+    restart: on-failure
+  mysql:
+    container_name: mysql_test
+    image: mysql:5.7
+    environment:
+      - MYSQL_DATABASE=hayum_test
+      - MYSQL_ROOT_PASSWORD=devmysql
+    ports:
+      - 3306:3306
