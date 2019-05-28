@@ -12,6 +12,7 @@ import (
 type AuthService interface {
 	Login(ctx context.Context, identifier string, password string, user *models.User) (*models.Session, error)
 	Register(ctx context.Context, user *models.User) error
+	// Logout(ctx context.Context, session *Session) error
 }
 
 type authService struct {
@@ -55,5 +56,12 @@ func (a *authService) Login(ctx context.Context, identifier string, password str
 }
 
 func (a *authService) Register(ctx context.Context, user *models.User) error {
-	panic("Implement me")
+	return a.userService.Save(ctx, user)
+}
+
+func (a *authService) Logout(ctx context.Context, user *models.User) error {
+	// TODO: destroy user session
+
+	return nil
+	//return a.userService.Logout()
 }

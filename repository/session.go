@@ -40,7 +40,9 @@ func (r *sqlSessionRepo) Update(ctx context.Context, s *models.Session) error {
 }
 
 func (r *sqlSessionRepo) DeleteByID(ctx context.Context, sessionID string, userID int) error {
-	panic("implement me")
+	stmt := "DELETE FROM Session WHERE SessionId=? AND UserId=?"
+	_, err := r.conn.ExecContext(ctx, stmt, sessionID, userID)
+	return err
 }
 
 func (r *sqlSessionRepo) Delete(ctx context.Context, s *models.Session) error {

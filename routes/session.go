@@ -23,6 +23,7 @@ func initSessionRoute(router Router) {
 
 	u.router.POST("/session", u.createSession)
 	//u.router.GET("/session/:id", u.getSessionByID)
+	//u.router.DELETE("/session/:id", u.deleteSessionByID)
 }
 
 func (s *sessionRoute) createSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -42,6 +43,10 @@ func (s *sessionRoute) createSession(w http.ResponseWriter, r *http.Request, ps 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 	s.router.JSONWithStatus(w, http.StatusCreated, session)
+}
+
+func (s *sessionRoute) getSession(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	schemaDecoder.SetAliasTag("json")
+
 }
