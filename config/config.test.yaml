@@ -3,7 +3,7 @@ port: :8080
 logpath: /var/log/hayum/log.txt
 
 db:
-  url: localhost
+  url: tcp(mysql:3306)
   user: root
   password: devmysql
   name: hayum_test
