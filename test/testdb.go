@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	"hayum/core_apis/db"
 	"hayum/core_apis/logger"
 	"hayum/core_apis/models"
@@ -8,7 +9,12 @@ import (
 )
 
 func truncate(conn *db.Conn) {
-	stmt := "TRUNCATE TABLE User, Session;"
+	stmt := `
+		SET foreign_key_checks=0;
+		TRUNCATE TABLE User;
+		TRUNCATE TABLE Session;
+		SET foreign_key_checks=1;
+	`
 	if _, err := conn.Exec(stmt); err != nil {
 		logger.Log.Errorf("error truncating database tables: %v", err)
 	}
@@ -17,7 +23,7 @@ func truncate(conn *db.Conn) {
 // persist user in db
 func seedUser(u *models.User, conn *db.Conn) {
 	userRepo := repository.NewSQLUserRepository(conn)
-	if err := userRepo.Save(nil, u); err != nil {
+	if err := userRepo.Save(context.Background(), u); err != nil {
 		logger.Log.Error(err)
 	}
 }

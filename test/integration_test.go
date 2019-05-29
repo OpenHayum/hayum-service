@@ -92,6 +92,8 @@ func (s *hayumSuite) TestCreateUser() {
 }
 
 func (s *hayumSuite) TestGetUser() {
+	user := getUser()
+	seedUser(user, s.Conn)
 	resp, err := s.ts.Client().Get(s.URL("user/1"))
 	s.checkError(err)
 	defer resp.Body.Close()
@@ -113,6 +115,8 @@ func (s *hayumSuite) TestGetUser() {
 // ************************************* Session ****************************************
 
 func (s *hayumSuite) TestCreateSession() {
+	user = getUser()
+	seedUser(user, s.Conn)
 	req, _ := http.NewRequest("POST", s.URL("session"), nil)
 	req.Header.Add("user-id", "1")
 
@@ -133,4 +137,5 @@ func (s *hayumSuite) TestCreateSession() {
 	s.checkError(err)
 
 	assert.True(s.T(), session.UserID == 1)
+	truncate(s.Conn)
 }
