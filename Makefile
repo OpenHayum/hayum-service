@@ -17,4 +17,9 @@ down:
 
 test:
 	docker-compose -f docker-compose.test.yaml up --build --exit-code-from hayum
-	docker-compose -f docker-compose.test.yaml down --volumes	
+	docker-compose -f docker-compose.test.yaml down --volumes
+
+# use this for local integration test
+# using docker-compose is a bit slow
+integration_test:
+	GO_ENV=integration go test ./test -tags=integration

@@ -3,15 +3,15 @@ package route
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/schema"
-	"github.com/julienschmidt/httprouter"
 	"hayum/core_apis/logger"
 	"hayum/core_apis/models"
 	"hayum/core_apis/repository"
 	"hayum/core_apis/service"
-	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/gorilla/schema"
+	"github.com/julienschmidt/httprouter"
 )
 
 var schemaDecoder = schema.NewDecoder()
@@ -68,8 +68,7 @@ func (u *userRoute) getUser(w http.ResponseWriter, r *http.Request, ps httproute
 	user, err := u.service.GetByID(ctx, id)
 
 	if err != nil {
-		log.Println(err)
-		log.Println("Cannot get user by id:", id)
+		logger.Log.Info("Cannot get user by id:", id)
 		http.Error(w, fmt.Sprintf("Cannot get user by id: %d", id), http.StatusNotFound)
 		return
 	}

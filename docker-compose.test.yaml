@@ -10,6 +10,8 @@ services:
     ports:
       - 8080:8080
     restart: on-failure
+    networks:
+      - hy-tests
   mysql:
     container_name: mysql_test
     image: mysql:5.7
@@ -18,3 +20,9 @@ services:
       - MYSQL_ROOT_PASSWORD=devmysql
     ports:
       - 3306:3306
+    networks:
+      - hy-tests
+
+networks:
+  hy-tests:
+    driver: bridge
