@@ -21,9 +21,9 @@ test:
 
 # use this for local integration test
 # using docker-compose is a bit slow
-integration_test:
-	GO_ENV=integration go test ./... -tags=integration
+test-integration:
+	GO_ENV=integration go test ./test...
 
-test_coverage:
-	GO_ENV=integration go test ./... -tags=integration -cover -coverprofile=coverage.out
+test-integration-coverage:
+	GO_ENV=integration go test ./test... -cover -coverprofile=coverage.out
 	go tool cover -func=coverage.out
