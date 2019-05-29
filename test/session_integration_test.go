@@ -9,6 +9,26 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// func (s *hayumSuite) getSession(userID int, sessionID string) *models.Session {
+// 	user := getUser()
+// 	seedUser(user, s.Conn)
+// 	resp, err := s.ts.Client().Get(s.URL("session"))
+// 	s.checkError(err)
+// 	defer resp.Body.Close()
+
+// 	respBody, err := ioutil.ReadAll(resp.Body)
+// 	s.checkError(err)
+
+// 	if resp.StatusCode != http.StatusOK {
+// 		s.T().Fatalf("%s", respBody)
+// 	}
+
+// 	var u models.User
+// 	err = json.Unmarshal(respBody, &u)
+// 	s.checkError(err)
+// 	logger.Log.Info(u)
+// }
+
 // ************************************* Session ****************************************
 
 func (s *hayumSuite) TestCreateSession() {

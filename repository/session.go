@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"hayum/core_apis/db"
+	"hayum/core_apis/errors"
 	"hayum/core_apis/models"
 )
 
@@ -40,6 +41,17 @@ func (r *sqlSessionRepo) Update(ctx context.Context, s *models.Session) error {
 
 func (r *sqlSessionRepo) DeleteByID(ctx context.Context, sessionID string, userID int) error {
 	stmt := "DELETE FROM Session WHERE SessionId=? AND UserId=?"
-	_, err := r.conn.ExecContext(ctx, stmt, sessionID, userID)
-	return err
+	res, err := r.conn.ExecContext(ctx, stmt, sessionID, userID)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return errors.ErrSessionAlreadyDeleted
+	}
+	return nil
 }

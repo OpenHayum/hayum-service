@@ -84,5 +84,10 @@ func (s *hayumSuite) TestLogout() {
 		s.T().Fatalf("%s %s", err, resp.Status)
 	}
 
+	resp, err = s.ts.Client().Do(req)
+	s.checkError(err)
+
+	assert.Equal(s.T(), http.StatusNotFound, resp.StatusCode, "Should return 404(Session already deleted)")
+
 	truncate(s.Conn)
 }

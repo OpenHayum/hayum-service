@@ -3,6 +3,7 @@ package route
 import (
 	"encoding/json"
 	"errors"
+	hyErrors "hayum/core_apis/errors"
 	"hayum/core_apis/logger"
 	"hayum/core_apis/models"
 	"hayum/core_apis/service"
@@ -97,7 +98,11 @@ func (a *authRoute) logout(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	if err := a.service.Logout(ctx, &session); err != nil {
 		logger.Log.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		status := http.StatusInternalServerError
+		if err == hyErrors.ErrSessionAlreadyDeleted {
+			status = http.StatusNotFound
+		}
+		http.Error(w, err.Error(), status)
 		return
 	}
 
