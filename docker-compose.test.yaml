@@ -7,8 +7,6 @@ services:
       context: .
       dockerfile: ./deployments/Dockerfile.test
     image: hayum_test:latest
-    volumes:
-      - $PWD:/go/src/hayum/core_apis
     ports:
       - 8080:8080
     restart: on-failure

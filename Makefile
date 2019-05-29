@@ -3,12 +3,11 @@
 run: stop up
 
 mod:
-	# This make rule requires Go 1.11+
 	GO111MODULE=on go mod tidy
-	GO111MODULE=on go mod vendor
+	# GO111MODULE=on go mod vendor
 
 up:
-	docker-compose -f docker-compose.yaml up --build
+	docker-compose -f docker-compose.yaml up --build -d
 
 stop:
 	docker-compose stop
@@ -17,5 +16,5 @@ down:
 	docker-compose down
 
 test:
-	docker-compose -f docker-compose.test.yaml up --build --abort-on-container-exit
+	docker-compose -f docker-compose.test.yaml up --build --exit-code-from hayum
 	docker-compose -f docker-compose.test.yaml down --volumes	

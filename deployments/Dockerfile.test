@@ -2,7 +2,8 @@ ARG GOLANG_VERSION="latest"
 
 FROM golang:${GOLANG_VERSION}
 
-ENV GO_ENV="test"
+ENV GO_ENV=test
+ENV GO111MODULE=on
 
 LABEL maintainer="Devajit Asem"
 
@@ -10,6 +11,4 @@ WORKDIR $GOPATH/src/hayum/core_apis
 
 COPY . .
 
-RUN GO111MODULE=on go get -d ./...
-
-RUN go test ./... -tags=integration 
+CMD go test ./... -tags=integration
