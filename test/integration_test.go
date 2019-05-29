@@ -1,5 +1,3 @@
-// +build integration
-
 package test
 
 import (
@@ -36,13 +34,7 @@ func (s *hayumSuite) SetupSuite() {
 	s.Conn = &db.Conn{DB: db.OpenContext(context.Background(), s.Cfg)}
 	s.ts = newServer(s.Conn)
 	s.URL = func(pathname string) string { return s.ts.URL + "/api/v1/" + pathname }
-	user = &models.User{
-		Email:     "dev@gmail.com",
-		FirstName: "Devajit",
-		LastName:  "Asem",
-		Mobile:    "6724986233",
-		Password:  "7hund3r",
-	}
+	user = getUser()
 }
 
 func (s *hayumSuite) TearDownSuite() {
@@ -74,9 +66,12 @@ func TestHayumSuite(t *testing.T) {
 
 func (s *hayumSuite) checkError(err error) {
 	if err != nil {
-		s.T().Error(err)
+		s.T().Fatal(err)
 	}
 }
+
+// ************************************* User ****************************************
+
 func (s *hayumSuite) TestCreateUser() {
 	ts := s.ts
 
@@ -93,6 +88,7 @@ func (s *hayumSuite) TestCreateUser() {
 
 	assert.True(s.T(), len(respBody) > 0)
 	assert.Equal(s.T(), resp.StatusCode, http.StatusCreated)
+	truncate(s.Conn)
 }
 
 func (s *hayumSuite) TestGetUser() {
@@ -110,5 +106,31 @@ func (s *hayumSuite) TestGetUser() {
 	var u models.User
 	err = json.Unmarshal(respBody, &u)
 	s.checkError(err)
+	logger.Log.Info(u)
 	assert.True(s.T(), u.Email == user.Email)
+}
+
+// ************************************* Session ****************************************
+
+func (s *hayumSuite) TestCreateSession() {
+	req, _ := http.NewRequest("POST", s.URL("session"), nil)
+	req.Header.Add("user-id", "1")
+
+	resp, err := s.ts.Client().Do(req)
+	s.checkError(err)
+
+	if resp.StatusCode != http.StatusCreated {
+		s.T().Fatalf("%s %s", err, resp.Status)
+	}
+
+	defer resp.Body.Close()
+
+	respBody, err := ioutil.ReadAll(resp.Body)
+	s.checkError(err)
+
+	var session models.Session
+	err = json.Unmarshal(respBody, &session)
+	s.checkError(err)
+
+	assert.True(s.T(), session.UserID == 1)
 }

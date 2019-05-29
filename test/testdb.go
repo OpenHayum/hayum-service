@@ -1,0 +1,23 @@
+package test
+
+import (
+	"hayum/core_apis/db"
+	"hayum/core_apis/logger"
+	"hayum/core_apis/models"
+	"hayum/core_apis/repository"
+)
+
+func truncate(conn *db.Conn) {
+	stmt := "TRUNCATE TABLE User, Session;"
+	if _, err := conn.Exec(stmt); err != nil {
+		logger.Log.Errorf("error truncating database tables: %v", err)
+	}
+}
+
+// persist user in db
+func seedUser(u *models.User, conn *db.Conn) {
+	userRepo := repository.NewSQLUserRepository(conn)
+	if err := userRepo.Save(nil, u); err != nil {
+		logger.Log.Error(err)
+	}
+}
