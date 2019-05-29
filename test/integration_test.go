@@ -8,6 +8,7 @@ import (
 	"hayum/core_apis/db"
 	"hayum/core_apis/logger"
 	"hayum/core_apis/models"
+	"hayum/core_apis/routes"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -16,10 +17,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-)
-
-var (
-	user *models.User
 )
 
 type hayumSuite struct {
@@ -34,7 +31,6 @@ func (s *hayumSuite) SetupSuite() {
 	s.Conn = &db.Conn{DB: db.OpenContext(context.Background(), s.Cfg)}
 	s.ts = newServer(s.Conn)
 	s.URL = func(pathname string) string { return s.ts.URL + "/api/v1/" + pathname }
-	user = getUser()
 }
 
 func (s *hayumSuite) TearDownSuite() {
@@ -70,17 +66,20 @@ func (s *hayumSuite) checkError(err error) {
 	}
 }
 
-// ************************************* User ****************************************
-
-func (s *hayumSuite) TestCreateUser() {
-	ts := s.ts
-
+func (s *hayumSuite) createUser(user *models.User) *http.Response {
 	reqBody, err := json.Marshal(user)
 	s.checkError(err)
 
-	resp, err := ts.Client().Post(s.URL("user"), "application/json", bytes.NewReader(reqBody))
+	resp, err := s.ts.Client().Post(s.URL("user"), "application/json", bytes.NewReader(reqBody))
 	s.checkError(err)
+	return resp
+}
 
+// ************************************* User ****************************************
+
+func (s *hayumSuite) TestCreateUser() {
+	user := getUser()
+	resp := s.createUser(user)
 	defer resp.Body.Close()
 
 	respBody, err := ioutil.ReadAll(resp.Body)
@@ -110,12 +109,13 @@ func (s *hayumSuite) TestGetUser() {
 	s.checkError(err)
 	logger.Log.Info(u)
 	assert.True(s.T(), u.Email == user.Email)
+	truncate(s.Conn)
 }
 
 // ************************************* Session ****************************************
 
 func (s *hayumSuite) TestCreateSession() {
-	user = getUser()
+	user := getUser()
 	seedUser(user, s.Conn)
 	req, _ := http.NewRequest("POST", s.URL("session"), nil)
 	req.Header.Add("user-id", "1")
@@ -137,5 +137,49 @@ func (s *hayumSuite) TestCreateSession() {
 	s.checkError(err)
 
 	assert.True(s.T(), session.UserID == 1)
+	truncate(s.Conn)
+}
+
+// ************************************* Auth(Register/Login) ****************************************
+
+func (s *hayumSuite) TestRegister() {
+	user := getUser()
+	reqBody, err := json.Marshal(user)
+	s.checkError(err)
+
+	resp, err := s.ts.Client().Post(s.URL("register"), "application/json", bytes.NewReader(reqBody))
+	s.checkError(err)
+
+	if resp.StatusCode != http.StatusCreated {
+		s.T().Fatalf("%v %s", err, resp.Status)
+	}
+
+	truncate(s.Conn)
+}
+
+func (s *hayumSuite) TestLogin() {
+	user := getUser()
+	s.createUser(user)
+	reqBody, err := json.Marshal(&route.LoginRequestBody{Identifier: user.Email, Password: user.Password})
+	s.checkError(err)
+
+	resp, err := s.ts.Client().Post(s.URL("login"), "application/json", bytes.NewReader(reqBody))
+	s.checkError(err)
+
+	if resp.StatusCode != http.StatusOK {
+		s.T().Fatalf("%v %s", err, resp.Status)
+	}
+
+	defer resp.Body.Close()
+
+	respBody, err := ioutil.ReadAll(resp.Body)
+	s.checkError(err)
+
+	var loginResp route.LoginResponseBody
+	err = json.Unmarshal(respBody, &loginResp)
+	s.checkError(err)
+	logger.Log.Info(loginResp)
+	assert.True(s.T(), loginResp.User.Email == user.Email, "Emails should be equal")
+
 	truncate(s.Conn)
 }

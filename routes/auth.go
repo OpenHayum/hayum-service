@@ -2,11 +2,12 @@ package route
 
 import (
 	"encoding/json"
-	"github.com/julienschmidt/httprouter"
 	"hayum/core_apis/logger"
 	"hayum/core_apis/models"
 	"hayum/core_apis/service"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 type authRoute struct {
@@ -14,12 +15,12 @@ type authRoute struct {
 	service service.AuthService
 }
 
-type loginRequestBody struct {
+type LoginRequestBody struct {
 	Identifier string
 	Password   string
 }
 
-type loginResponseBody struct {
+type LoginResponseBody struct {
 	User    *models.User
 	Session *models.Session
 }
@@ -30,14 +31,13 @@ func initAuthRoute(router Router) {
 
 	// TODO: implement web login api using cookies
 	u.router.POST("/login", u.login)
-
-	u.router.GET("/register", u.register)
+	u.router.POST("/register", u.register)
 }
 
 func (a *authRoute) login(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ctx := r.Context()
 
-	body := loginRequestBody{}
+	body := LoginRequestBody{}
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		logger.Log.Error(err)
@@ -54,7 +54,7 @@ func (a *authRoute) login(w http.ResponseWriter, r *http.Request, ps httprouter.
 
 	logger.Log.Info(user, session)
 
-	response := &loginResponseBody{user, session}
+	response := &LoginResponseBody{user, session}
 
 	a.router.JSON(w, response)
 }
