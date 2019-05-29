@@ -11,7 +11,6 @@ type SessionRepository interface {
 	GetByID(ctx context.Context, sessionID string, userID int) (*models.Session, error)
 	Update(ctx context.Context, s *models.Session) error
 	DeleteByID(ctx context.Context, sessionID string, userID int) error
-	Delete(ctx context.Context, s *models.Session) error
 }
 
 type sqlSessionRepo struct {
@@ -43,8 +42,4 @@ func (r *sqlSessionRepo) DeleteByID(ctx context.Context, sessionID string, userI
 	stmt := "DELETE FROM Session WHERE SessionId=? AND UserId=?"
 	_, err := r.conn.ExecContext(ctx, stmt, sessionID, userID)
 	return err
-}
-
-func (r *sqlSessionRepo) Delete(ctx context.Context, s *models.Session) error {
-	panic("implement me")
 }

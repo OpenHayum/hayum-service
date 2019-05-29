@@ -2,17 +2,18 @@ package service
 
 import (
 	"context"
-	"github.com/pkg/errors"
 	"hayum/core_apis/db"
 	"hayum/core_apis/logger"
 	"hayum/core_apis/models"
 	"hayum/core_apis/repository"
+
+	"github.com/pkg/errors"
 )
 
 type AuthService interface {
 	Login(ctx context.Context, identifier string, password string, user *models.User) (*models.Session, error)
-	Register(ctx context.Context, user *models.User) error
-	// Logout(ctx context.Context, session *Session) error
+	Register(context.Context, *models.User) error
+	Logout(context.Context, *models.Session) error
 }
 
 type authService struct {
@@ -59,9 +60,6 @@ func (a *authService) Register(ctx context.Context, user *models.User) error {
 	return a.userService.Save(ctx, user)
 }
 
-func (a *authService) Logout(ctx context.Context, user *models.User) error {
-	// TODO: destroy user session
-
-	return nil
-	//return a.userService.Logout()
+func (a *authService) Logout(ctx context.Context, session *models.Session) error {
+	return a.sessionService.DeleteByID(ctx, session.SessionID, session.UserID)
 }

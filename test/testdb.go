@@ -27,3 +27,11 @@ func seedUser(u *models.User, conn *db.Conn) {
 		logger.Log.Error(err)
 	}
 }
+
+// persist session in db
+func seedSession(u *models.User, conn *db.Conn) {
+	repo := repository.NewSQLSessionRepository(conn)
+	if err := repo.Save(context.Background(), &models.Session{UserID: u.Id}); err != nil {
+		logger.Log.Error(err)
+	}
+}

@@ -13,7 +13,6 @@ type SessionService interface {
 	GetByID(ctx context.Context, sessionID string, userID int) (*models.Session, error)
 	Update(ctx context.Context, s *models.Session) error
 	DeleteByID(ctx context.Context, sessionID string, userID int) error
-	Delete(ctx context.Context, s *models.Session) error
 }
 
 type sessionService struct {
@@ -43,9 +42,5 @@ func (ss *sessionService) Update(ctx context.Context, s *models.Session) error {
 }
 
 func (ss *sessionService) DeleteByID(ctx context.Context, sessionID string, userID int) error {
-	panic("implement me")
-}
-
-func (ss *sessionService) Delete(ctx context.Context, s *models.Session) error {
-	panic("implement me")
+	return ss.repo.DeleteByID(ctx, sessionID, userID)
 }

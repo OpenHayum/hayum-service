@@ -59,7 +59,7 @@ func TestHayumSuite(t *testing.T) {
 
 func (s *hayumSuite) checkError(err error) {
 	if err != nil {
-		s.T().Fatal(err)
+		s.T().Fatalf("%v", err)
 	}
 }
 
