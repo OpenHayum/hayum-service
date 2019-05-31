@@ -8,7 +8,6 @@
     "@types/react": "16.8.19",
     "@types/react-dom": "16.8.4",
     "babel-plugin-import": "^1.11.2",
-    "bem-cn": "^3.0.1",
     "classnames": "^2.2.6",
     "customize-cra": "^0.2.12",
     "less": "^3.9.0",

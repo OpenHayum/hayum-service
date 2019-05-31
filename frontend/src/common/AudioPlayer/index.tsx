@@ -205,8 +205,7 @@ class AudioPlayer extends Component<any, any> {
                       style={{left: playheadPosition}}
                   />
                 </div>
-                <div
-                    className="ap__playback-time ap__playback-time__right ap__control">
+                <div className="ap__playback-time ap__playback-time__right ap__control">
                   {totalDuration}
                 </div>
               </div>
