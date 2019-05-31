@@ -4,4 +4,3 @@ vendor
 .swp
 core_apis
 *.out
-frontend/node_modules/
