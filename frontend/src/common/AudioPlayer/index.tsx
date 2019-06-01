@@ -1,5 +1,5 @@
 import React, {Component, ReactElement} from "react";
-import classnames from "classnames";
+import cx from "classnames";
 import * as PropTypes from "prop-types";
 
 import "./audioPlayer.less";
@@ -21,6 +21,7 @@ interface AudioPlayerState {
   currentDuration: string;
   totalDuration: string;
   [controlNames.IsPlaying]?: boolean;
+  hasMuted: boolean;
 }
 
 class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
@@ -38,7 +39,6 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
   player: HTMLAudioElement | null;
   mouseOnPlayhead: boolean;
   timelineWidth: string | null;
-  duration: any;
   handleEnded: any;
 
   constructor(props) {
@@ -48,14 +48,14 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
       playheadPosition: 0,
       activeTimelineWidth: 0,
       currentDuration: "00:00",
-      totalDuration: this.formatTime(0)
+      totalDuration: this.formatTime(0),
+      hasMuted: false
     };
 
     this.timeline = null;
     this.playhead = null;
     this.timelineWidth = null;
     this.mouseOnPlayhead = false;
-    this.duration = null;
     this.player = null;
   }
 
@@ -116,18 +116,26 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
   handleTimeUpdate = (): void => {
     if (!this.player) return;
     const timelineWidth = 300;
-    const playPercent = timelineWidth * (this.player.currentTime / this.duration);
+    const {duration, currentTime} = this.player;
+    const playPercent = timelineWidth * (currentTime / duration);
 
     this.setState({
       playheadPosition: playPercent,
-      currentDuration: this.formatTime(this.player.currentTime),
+      currentDuration: this.formatTime(currentTime),
     });
-  }
+  };
 
   handleCanPlayThrough = (): void => {
     if (!this.player) return;
     this.setState({totalDuration: this.formatTime(this.player.duration)})
-  }
+  };
+
+  handleVolumeToggle = (): void => {
+    if (!this.player) return;
+    const {hasMuted} = this.state;
+    this.player.muted = !hasMuted;
+    this.setState({hasMuted: !hasMuted});
+  };
 
   mouseDown = (): void => {
     this.mouseOnPlayhead = true;
@@ -143,7 +151,7 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
   };
 
   movePlayhead = (event: MouseEvent): void => {
-    if (!this.timeline) return;
+    if (!this.timeline || !this.player) return;
 
     const {left, width: timelineWidth} = this.getPosition(this.timeline);
     // const { duration } = this.state;
@@ -161,7 +169,7 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
       playheadPosition,
       activeTimelineWidth: playheadPosition,
       currentDuration: this.formatTime(
-          this.duration * (playheadPosition / timelineWidth)
+          this.player.duration * (playheadPosition / timelineWidth)
       )
     });
   };
@@ -172,7 +180,8 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
       playheadPosition,
       activeTimelineWidth,
       currentDuration,
-      totalDuration
+      totalDuration,
+      hasMuted
     } = this.state;
 
     return (
@@ -194,7 +203,7 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
                 </button>
                 <button
                     name={controlNames.IsPlaying}
-                    className={classnames(
+                    className={cx(
                         "ap__icon ap__circle ap__control",
                         {
                           "ap__circle--play": isPlaying,
@@ -235,8 +244,8 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
           </div>
           <div className="ap__volume">
             <div>
-              <div className="ap__volume__icon">
-                <i className="icon-volume-2"/>
+              <div className="ap__volume__icon" onClick={this.handleVolumeToggle}>
+                <i className={cx({"icon-volume-2": !hasMuted, "icon-volume-off": hasMuted})}/>
               </div>
               <div className="ap__volume__controls">
                 <div className="ap__volume__controls__timeline"/>
