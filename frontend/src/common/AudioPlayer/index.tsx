@@ -37,9 +37,9 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
   timeline: HTMLElement | null;
   playhead: HTMLElement | null;
   player: HTMLAudioElement | null;
+  timelineDimension: ClientRect | null;
   mouseOnPlayhead: boolean;
-  timelineWidth: string | null;
-  handleEnded: any;
+  startDuration: string;
 
   constructor(props) {
     super(props);
@@ -54,9 +54,10 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
 
     this.timeline = null;
     this.playhead = null;
-    this.timelineWidth = null;
     this.mouseOnPlayhead = false;
     this.player = null;
+    this.timelineDimension = null;
+    this.startDuration = "00:00";
   }
 
   componentDidMount(): void {
@@ -79,16 +80,21 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
   };
 
   formatTime = (seconds: number): string => {
-    if (!seconds) return "00:00";
+    if (!seconds) return this.startDuration;
     const minutes = Math.floor(seconds / 60);
-    const minutesStr = minutes >= 10 ? minutes + "" : "0" + minutes;
+    const minutesStr = minutes >= 10 ? minutes.toString() : "0" + minutes;
     seconds = Math.floor(seconds % 60);
-    const secondsStr = seconds >= 10 ? seconds + "" : "0" + seconds;
+    const secondsStr = seconds >= 10 ? seconds.toString() : "0" + seconds;
     return minutesStr + ":" + secondsStr;
   };
 
   getPosition = (el: HTMLElement): ClientRect => {
     return el.getBoundingClientRect();
+  };
+
+  handleEnded = (): void => {
+    if (!this.player) return;
+    this.setState({...this.state, currentDuration: this.startDuration, isPlaying: false});
   };
 
   handleControlClick = (): void => {
@@ -114,10 +120,11 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
   };
 
   handleTimeUpdate = (): void => {
-    if (!this.player) return;
-    const timelineWidth = 300;
+    if (!this.player || !this.timelineDimension) return;
+
     const {duration, currentTime} = this.player;
-    const playPercent = timelineWidth * (currentTime / duration);
+    const {width} = this.timelineDimension;
+    const playPercent = width * (currentTime / duration);
 
     this.setState({
       playheadPosition: playPercent,
@@ -155,7 +162,7 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
 
     const {left, width: timelineWidth} = this.getPosition(this.timeline);
     // const { duration } = this.state;
-    var newMargLeft = event.clientX - left;
+    const newMargLeft = event.clientX - left;
     let playheadPosition = newMargLeft;
 
     if (newMargLeft < 0) {
@@ -164,13 +171,13 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
     if (newMargLeft > timelineWidth) {
       playheadPosition = timelineWidth;
     }
-
+    const currentTime: number = this.player.duration * (playheadPosition / timelineWidth);
+    const currentDuration: string = this.formatTime(currentTime);
+    this.player.currentTime = currentTime;
     this.setState({
       playheadPosition,
       activeTimelineWidth: playheadPosition,
-      currentDuration: this.formatTime(
-          this.player.duration * (playheadPosition / timelineWidth)
-      )
+      currentDuration,
     });
   };
 
@@ -259,7 +266,7 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
   setTimelineRef = _ref => {
     this.timeline = _ref;
     if (!this.timeline) return;
-    this.timelineWidth = this.timeline.style.width;
+    this.timelineDimension = this.getPosition(this.timeline);
     this.timeline.addEventListener("click", this.handleTimelineClick, false);
   };
 
