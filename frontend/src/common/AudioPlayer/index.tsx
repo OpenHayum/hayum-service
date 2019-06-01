@@ -1,16 +1,29 @@
-import React, {Component} from "react";
+import React, {Component, ReactElement} from "react";
 import classnames from "classnames";
 import * as PropTypes from "prop-types";
 
 import "./audioPlayer.less";
 
-const controlNames = {
-  IS_PLAYING: "isPlaying",
-  IS_PAUSED: 'isPaused',
-  IS_RESET: 'isReset',
-};
 
-class AudioPlayer extends Component<any, any> {
+enum controlNames {
+  IsPlaying = 'isPlaying'
+}
+
+interface AudioPlayerProps {
+  // TODO: make src `required` when AudioPlayer is more stable
+  // it is just for testing purpose
+  src?: string;
+}
+
+interface AudioPlayerState {
+  playheadPosition: number;
+  activeTimelineWidth: number;
+  currentDuration: string;
+  totalDuration: string;
+  [controlNames.IsPlaying]?: boolean;
+}
+
+class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
   static propTypes = {
     src: PropTypes.string
   };
@@ -19,12 +32,13 @@ class AudioPlayer extends Component<any, any> {
     src: "http://www.panacherock.com/downloads/mp3/01_Afterlife.mp3"
   };
 
-  timeline: any;
-  timelineWidth: any;
-  playhead: any;
-  mouseOnPlayhead: any;
+  state: AudioPlayerState;
+  timeline: HTMLElement | null;
+  playhead: HTMLElement | null;
+  player: HTMLAudioElement | null;
+  mouseOnPlayhead: boolean;
+  timelineWidth: string | null;
   duration: any;
-  player: any;
   handleEnded: any;
 
   constructor(props) {
@@ -34,49 +48,52 @@ class AudioPlayer extends Component<any, any> {
       playheadPosition: 0,
       activeTimelineWidth: 0,
       currentDuration: "00:00",
-      totalDuration: this.formatTime(null)
+      totalDuration: this.formatTime(0)
     };
 
     this.timeline = null;
-    this.timelineWidth = null;
     this.playhead = null;
+    this.timelineWidth = null;
     this.mouseOnPlayhead = false;
     this.duration = null;
     this.player = null;
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     window.addEventListener("mouseup", this.mouseUp, false);
   }
 
-  componentWillUnmount() {
+  componentWillUnmount(): void {
     window.removeEventListener("mouseup", this.mouseUp, false);
+    if (!this.player) return;
+
     this.player.removeEventListener('canplaythrough', this.handleCanPlayThrough, false);
     this.player.removeEventListener('timeupdate', this.handleTimeUpdate, false);
     this.player.removeEventListener('ended', this.handleEnded, false);
   }
 
-  clickPercent = (event) => {
+  clickPercent = (event: MouseEvent): number => {
+    if (!this.timeline) return 0;
     const {left, width} = this.getPosition(this.timeline);
     return (event.clientX - left) / width;
   };
 
-  formatTime = seconds => {
-    if (!!seconds === false) return "00:00";
-
-    let minutes: any;
-    minutes = Math.floor(seconds / 60);
-    minutes = minutes >= 10 ? minutes : "0" + minutes;
+  formatTime = (seconds: number): string => {
+    if (!seconds) return "00:00";
+    const minutes = Math.floor(seconds / 60);
+    const minutesStr = minutes >= 10 ? minutes + "" : "0" + minutes;
     seconds = Math.floor(seconds % 60);
-    seconds = seconds >= 10 ? seconds : "0" + seconds;
-    return minutes + ":" + seconds;
+    const secondsStr = seconds >= 10 ? seconds + "" : "0" + seconds;
+    return minutesStr + ":" + secondsStr;
   };
 
-  getPosition = el => {
+  getPosition = (el: HTMLElement): ClientRect => {
     return el.getBoundingClientRect();
   };
 
-  handleControlClick = ({target}) => {
+  handleControlClick = (): void => {
+    if (!this.player) return;
+
     const {isPlaying} = this.state;
 
     if (isPlaying) {
@@ -86,16 +103,18 @@ class AudioPlayer extends Component<any, any> {
     }
 
     this.setState({
-      [target.name]: !isPlaying
+      ...this.state,
+      isPlaying: !isPlaying
     });
   };
 
-  handleTimelineClick = e => {
+  handleTimelineClick = (e: MouseEvent): void => {
     // console.info(e);
     this.movePlayhead(e);
   };
 
-  handleTimeUpdate = () => {
+  handleTimeUpdate = (): void => {
+    if (!this.player) return;
     const timelineWidth = 300;
     const playPercent = timelineWidth * (this.player.currentTime / this.duration);
 
@@ -105,17 +124,17 @@ class AudioPlayer extends Component<any, any> {
     });
   }
 
-  handleCanPlayThrough = () => {
-    this.duration = this.player.duration;
+  handleCanPlayThrough = (): void => {
+    if (!this.player) return;
     this.setState({totalDuration: this.formatTime(this.player.duration)})
   }
 
-  mouseDown = () => {
+  mouseDown = (): void => {
     this.mouseOnPlayhead = true;
     window.addEventListener("mousemove", this.movePlayhead, true);
   };
 
-  mouseUp = event => {
+  mouseUp = (event: MouseEvent): void => {
     if (this.mouseOnPlayhead) {
       this.movePlayhead(event);
       window.removeEventListener("mousemove", this.movePlayhead, true);
@@ -123,7 +142,9 @@ class AudioPlayer extends Component<any, any> {
     this.mouseOnPlayhead = false;
   };
 
-  movePlayhead = event => {
+  movePlayhead = (event: MouseEvent): void => {
+    if (!this.timeline) return;
+
     const {left, width: timelineWidth} = this.getPosition(this.timeline);
     // const { duration } = this.state;
     var newMargLeft = event.clientX - left;
@@ -145,7 +166,7 @@ class AudioPlayer extends Component<any, any> {
     });
   };
 
-  render() {
+  render(): ReactElement {
     const {
       isPlaying,
       playheadPosition,
@@ -172,7 +193,7 @@ class AudioPlayer extends Component<any, any> {
                   <i className="icon-control-start"/>
                 </button>
                 <button
-                    name={controlNames.IS_PLAYING}
+                    name={controlNames.IsPlaying}
                     className={classnames(
                         "ap__icon ap__circle ap__control",
                         {
@@ -228,18 +249,20 @@ class AudioPlayer extends Component<any, any> {
 
   setTimelineRef = _ref => {
     this.timeline = _ref;
+    if (!this.timeline) return;
     this.timelineWidth = this.timeline.style.width;
-    console.info(this.timeline.getBoundingClientRect());
     this.timeline.addEventListener("click", this.handleTimelineClick, false);
   };
 
   setPlayheadRef = _ref => {
     this.playhead = _ref;
+    if (!this.playhead) return;
     this.playhead.addEventListener("mousedown", this.mouseDown, false);
   };
 
   setPlayerRef = _ref => {
     this.player = _ref;
+    if (!this.player) return;
     this.player.volume = 0.2;
     this.player.addEventListener('canplaythrough', this.handleCanPlayThrough, false);
     this.player.addEventListener('timeupdate', this.handleTimeUpdate, false);
