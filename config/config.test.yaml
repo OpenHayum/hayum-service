@@ -1,15 +1,4 @@
-port: :8080
-
-logpath: /var/log/hayum/log.txt
-
 db:
   url: tcp(mysql:3306)
-  user: root
   password: devmysql
   name: hayum_test
-s3:
-  bucket: dev-hy
-  directory: tracks
-
-# 30 days!!!
-session_expiration_time_ms: 2592000000

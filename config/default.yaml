@@ -1,0 +1,14 @@
+port: :8080
+
+logpath: /var/log/hayum/log.txt
+
+db:
+  user: root
+  password: devmysql
+s3:
+  bucket: dev-hy
+  directory: tracks
+
+# 30 days!!!
+session_table_name: Session
+session_expiration_time_ms: 2592000000
