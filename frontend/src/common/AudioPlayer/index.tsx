@@ -1,9 +1,10 @@
 import React, {Component, ReactElement} from "react";
 import cx from "classnames";
 import * as PropTypes from "prop-types";
+import {Slider} from "antd";
+import {SliderValue} from "antd/lib/slider";
 
 import "./audioPlayer.less";
-
 
 enum controlNames {
   IsPlaying = 'isPlaying'
@@ -20,8 +21,8 @@ interface AudioPlayerState {
   activeTimelineWidth: number;
   currentDuration: string;
   totalDuration: string;
-  [controlNames.IsPlaying]?: boolean;
   hasMuted: boolean;
+  [controlNames.IsPlaying]?: boolean;
 }
 
 class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
@@ -38,11 +39,13 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
   playhead: HTMLElement | null;
   player: HTMLAudioElement | null;
   timelineDimension: ClientRect | null;
+  defaultVolume: number;
   mouseOnPlayhead: boolean;
   startDuration: string;
 
-  constructor(props) {
+  constructor(props: AudioPlayerProps) {
     super(props);
+
     this.state = {
       isPlaying: false,
       playheadPosition: 0,
@@ -54,6 +57,7 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
 
     this.timeline = null;
     this.playhead = null;
+    this.defaultVolume = 0.3;
     this.mouseOnPlayhead = false;
     this.player = null;
     this.timelineDimension = null;
@@ -115,7 +119,6 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
   };
 
   handleTimelineClick = (e: MouseEvent): void => {
-    // console.info(e);
     this.movePlayhead(e);
   };
 
@@ -127,7 +130,9 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
     const playPercent = width * (currentTime / duration);
 
     this.setState({
+      ...this.state,
       playheadPosition: playPercent,
+      activeTimelineWidth: playPercent,
       currentDuration: this.formatTime(currentTime),
     });
   };
@@ -142,6 +147,13 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
     const {hasMuted} = this.state;
     this.player.muted = !hasMuted;
     this.setState({hasMuted: !hasMuted});
+  };
+
+  handleVolumeChange = (value: SliderValue): void => {
+    if (!this.player) return;
+    if (value instanceof Array) return;
+
+    this.player.volume = value;
   };
 
   mouseDown = (): void => {
@@ -171,8 +183,10 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
     if (newMargLeft > timelineWidth) {
       playheadPosition = timelineWidth;
     }
+
     const currentTime: number = this.player.duration * (playheadPosition / timelineWidth);
     const currentDuration: string = this.formatTime(currentTime);
+
     this.player.currentTime = currentTime;
     this.setState({
       playheadPosition,
@@ -188,7 +202,7 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
       activeTimelineWidth,
       currentDuration,
       totalDuration,
-      hasMuted
+      hasMuted,
     } = this.state;
 
     return (
@@ -255,7 +269,14 @@ class AudioPlayer extends Component<AudioPlayerProps, AudioPlayerState> {
                 <i className={cx({"icon-volume-2": !hasMuted, "icon-volume-off": hasMuted})}/>
               </div>
               <div className="ap__volume__controls">
-                <div className="ap__volume__controls__timeline"/>
+                <Slider
+                    defaultValue={this.defaultVolume}
+                    tooltipVisible={false}
+                    min={0}
+                    max={1}
+                    step={0.1}
+                    onChange={this.handleVolumeChange}
+                />
               </div>
             </div>
           </div>
