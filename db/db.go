@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"github.com/srinathgs/mysqlstore"
 	"hayum/core_apis/logger"
 	"log"
 	"time"
@@ -16,22 +17,37 @@ type Conn struct {
 	*sqlx.DB
 }
 
+var Store *mysqlstore.MySQLStore
+
 func getDSN(cfg *viper.Viper) string {
 	user := cfg.GetString("db.user")
 	password := cfg.GetString("db.password")
 	db := cfg.GetString("db.name")
 	address := cfg.GetString("db.url")
-
+	logger.Log.Info(cfg)
 	logger.Log.Info("Address: ", address)
-	// config := mysql.Config{
-	// 	User:   user,
-	// 	Passwd: password,
-	// 	Addr:   address,
-	// 	DBName: db,
-	// }
-
-	// return config.FormatDSN()
+	//config := mysql.Config{
+	//	User:   user,
+	//	Passwd: password,
+	//	Addr:   address,
+	//	DBName: db,
+	//}
+	//
+	//return config.FormatDSN()
 	return fmt.Sprintf("%s:%s@%s/%s?multiStatements=true&parseTime=true", user, password, address, db)
+}
+
+func createSessionStore(db *sqlx.DB, cfg *viper.Viper) {
+	var err error
+
+	tableName := cfg.GetString("session.table_name")
+	maxAge := cfg.GetInt("session.expiration_time_ms")
+	secretKey := cfg.GetString("session.secret_key")
+
+	Store, err = mysqlstore.NewMySQLStoreFromConnection(db.DB, tableName, "/", maxAge, []byte(secretKey))
+	if err != nil {
+		logger.Log.Panic(err)
+	}
 }
 
 func OpenContext(ctx context.Context, cfg *viper.Viper) *sqlx.DB {
@@ -49,6 +65,7 @@ func OpenContext(ctx context.Context, cfg *viper.Viper) *sqlx.DB {
 
 	// create mysql tables
 	db.MustExecContext(ctx, createDDL)
+	createSessionStore(db, cfg)
 
 	return db
 }

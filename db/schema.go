@@ -75,17 +75,4 @@ CREATE TABLE IF NOT EXISTS S3Document
 	ModifiedDate     DATETIME,
 	DeletedDate      DATETIME
 );
-
--- ************************************** Session
-
-CREATE TABLE IF NOT EXISTS Session
-(
-	SessionId VARCHAR(100) NOT NULL ,
-	UserId    INT NOT NULL ,
-	ExpiresAt TIMESTAMP,
-	CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	UpdatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	PRIMARY KEY (SessionId, UserId),
-	CONSTRAINT FK_SESSION_USER_USERID FOREIGN KEY (UserId) REFERENCES User (Id)
-);
 `

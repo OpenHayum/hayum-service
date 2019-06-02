@@ -3,6 +3,7 @@ port: :8080
 logpath: /var/log/hayum/log.txt
 
 db:
+  url:
   user: root
   password: devmysql
 s3:
@@ -10,5 +11,8 @@ s3:
   directory: tracks
 
 # 30 days!!!
-session_table_name: Session
-session_expiration_time_ms: 2592000000
+session:
+  table_name: Session
+  expiration_time_ms: 2592000000
+  # it will be persisted externally in production environment
+  secret_key: 8s$#kslsd120981293
