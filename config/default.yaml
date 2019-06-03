@@ -13,6 +13,6 @@ s3:
 # 30 days!!!
 session:
   table_name: Session
-  expiration_time_ms: 2592000000
+  expiration_time_ms: 3600
   # it will be persisted externally in production environment
   secret_key: 8s$#kslsd120981293
