@@ -1,11 +1,12 @@
 package route
 
 import (
+	"encoding/gob"
 	"encoding/json"
 	"github.com/julienschmidt/httprouter"
 	"hayum/core_apis/config"
 	"hayum/core_apis/db"
-	hyErrors "hayum/core_apis/errors"
+	"hayum/core_apis/errors"
 	"hayum/core_apis/logger"
 	"hayum/core_apis/models"
 	"hayum/core_apis/service"
@@ -22,8 +23,15 @@ type LoginRequestBody struct {
 	Password   string
 }
 
+type SessionResponse struct {
+	UserId          int
+	Email           string
+	IsAuthenticated bool
+}
+
 func initAuthRoute(router Router) {
 	authService := service.NewAuthService(router.GetConn())
+	gob.Register(SessionResponse{})
 	u := authRoute{router, authService}
 
 	// TODO: implement web login api using cookies
@@ -32,40 +40,25 @@ func initAuthRoute(router Router) {
 	u.router.POST("/logout", u.logout)
 }
 
-func handleSessionErr(err error, w http.ResponseWriter) {
-	if err != nil {
-		logger.Log.Error(err)
-		http.Error(w, hyErrors.ErrUnableToGetSession.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
 func (a *authRoute) login(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ctx := r.Context()
 
 	body := LoginRequestBody{}
+	err := json.NewDecoder(r.Body).Decode(&body)
+	errors.CheckAndSendResponseErrorWithStatus(err, w, http.StatusBadRequest)
 
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		logger.Log.Error(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
 	user := &models.User{}
-	err := a.service.Login(ctx, body.Identifier, body.Password, user)
-	if err != nil {
-		logger.Log.Error(err)
-		http.Error(w, "Not Authorized", http.StatusForbidden)
-		return
-	}
+	err = a.service.Login(ctx, body.Identifier, body.Password, user)
+	errors.CheckAndSendResponseErrorWithStatus(err, w, http.StatusForbidden)
 
 	session, err := db.Store.Get(r, "hayum-session")
-	handleSessionErr(err, w)
+	errors.CheckAndSendResponseInternalServerError(err, w)
 
-	session.Values["user-id"] = user.Id
-	session.Values["email"] = user.Email
+	sessionRes := &SessionResponse{user.Id, user.Email, true}
+	session.Values["user"] = sessionRes
+
 	err = session.Save(r, w)
-	handleSessionErr(err, w)
-	//logger.Log.Info(session)
+	errors.CheckAndSendResponseInternalServerError(err, w)
 
 	a.router.JSON(w, user)
 }
@@ -73,37 +66,36 @@ func (a *authRoute) login(w http.ResponseWriter, r *http.Request, ps httprouter.
 func (a *authRoute) register(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ctx := r.Context()
 	body := models.User{}
+	err := json.NewDecoder(r.Body).Decode(&body)
+	errors.CheckAndSendResponseErrorWithStatus(err, w, http.StatusBadRequest)
 
-	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		logger.Log.Error(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	if err := a.service.Register(ctx, &body); err != nil {
-		logger.Log.Error(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	err = a.service.Register(ctx, &body)
+	errors.CheckAndSendResponseInternalServerError(err, w)
 
 	w.WriteHeader(http.StatusCreated)
 }
 
 func (a *authRoute) logout(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if r.Header.Get("Cookie") == "" {
-		http.Error(w, http.ErrNoCookie.Error(), http.StatusBadRequest)
-		return
+		errors.CheckAndSendResponseErrorWithStatus(http.ErrNoCookie, w, http.StatusBadRequest)
 	}
 
 	session, err := db.Store.Get(r, config.SessionName)
-	if err != nil {
-		http.Error(w, http.ErrNoCookie.Error(), http.StatusForbidden)
-		return
+	logger.Log.Info(session, session.Values["user"])
+
+	// check for request which are already logged out
+	if err != nil || session.Values["user"] == nil {
+		errors.CheckAndSendResponseErrorWithStatus(err, w, http.StatusForbidden)
 	}
 
-	if err := db.Store.Delete(r, w, session); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	session.Options.MaxAge = -1
+	session.Values["user"] = &SessionResponse{}
+
+	err = session.Save(r, w)
+	errors.CheckAndSendResponseInternalServerError(err, w)
+
+	err = db.Store.Delete(r, w, session)
+	errors.CheckAndSendResponseInternalServerError(err, w)
 
 	w.WriteHeader(http.StatusOK)
 }

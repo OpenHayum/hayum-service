@@ -71,22 +71,14 @@ func (s *hayumSuite) TestLogout() {
 	user := getUser()
 
 	resp := s.loginUser(user)
-
 	req, _ := http.NewRequest("POST", s.URL("logout"), nil)
-	//req.Header.Add("Cookie", resp.Header.Get("Set-Cookie"))
+	req.Header.Add("Cookie", resp.Header.Get("Set-Cookie"))
 	resp, err := s.ts.Client().Do(req)
 	s.checkError(err)
 
 	if resp.StatusCode != http.StatusOK {
 		s.T().Fatalf("%s %s", err, resp.Status)
 	}
-
-	req.Header.Set("Cookie", resp.Header.Get("Set-Cookie"))
-
-	resp, err = s.ts.Client().Do(req)
-	s.checkError(err)
-
-	assert.Equal(s.T(), http.StatusForbidden, resp.StatusCode, "Should return 403(Cookie is already expired!)")
 
 	truncate(s.Conn)
 }

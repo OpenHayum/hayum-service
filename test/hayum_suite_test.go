@@ -31,7 +31,7 @@ func (s *hayumSuite) SetupSuite() {
 }
 
 func (s *hayumSuite) TearDownSuite() {
-	defer s.Conn.Close()
+	defer s.Conn.DB.DB.Close()
 	logger.Log.Info("Tearing down")
 	dropTables := `
 		SET foreign_key_checks = 0;
