@@ -80,5 +80,11 @@ func (s *hayumSuite) TestLogout() {
 		s.T().Fatalf("%s %s", err, resp.Status)
 	}
 
+	req.Header.Set("Cookie", "")
+
+	resp, err = s.ts.Client().Do(req)
+	s.checkError(err)
+
+	assert.Equal(s.T(), http.StatusBadRequest, resp.StatusCode, "Should return 400")
 	truncate(s.Conn)
 }
