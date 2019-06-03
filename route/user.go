@@ -10,11 +10,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gorilla/schema"
 	"github.com/julienschmidt/httprouter"
 )
-
-var schemaDecoder = schema.NewDecoder()
 
 type userRoute struct {
 	router  Router
@@ -32,7 +29,6 @@ func initUserRoute(router Router) {
 }
 
 func (u *userRoute) createUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	schemaDecoder.SetAliasTag("json")
 	var user models.User
 
 	ctx := r.Context()

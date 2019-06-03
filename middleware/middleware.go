@@ -6,7 +6,6 @@ import (
 	"hayum/core_apis/config"
 	"hayum/core_apis/db"
 	hyErrors "hayum/core_apis/errors"
-	"hayum/core_apis/logger"
 	"net/http"
 )
 
@@ -15,7 +14,7 @@ func Protected(next httprouter.Handle) httprouter.Handle {
 		session, err := db.Store.Get(r, config.SessionName)
 		hyErrors.CheckAndSendResponseBadRequest(err, w)
 		userVal := session.Values["user"]
-		logger.Log.Info("Middleware:", session, userVal, r.Header.Get("Cookie"), session.IsNew)
+		//logger.Log.Info("Middleware:", session, userVal, r.Header.Get("Cookie"), session.IsNew)
 		if userVal == nil {
 			http.Error(w, errors.New("user not logged in").Error(), http.StatusUnauthorized)
 			return

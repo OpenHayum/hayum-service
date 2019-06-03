@@ -51,7 +51,7 @@ func (a *authRoute) login(w http.ResponseWriter, r *http.Request, ps httprouter.
 	err = a.service.Login(ctx, body.Identifier, body.Password, user)
 	errors.CheckAndSendResponseErrorWithStatus(err, w, http.StatusForbidden)
 
-	session, err := db.Store.Get(r, "hayum-session")
+	session, err := db.Store.Get(r, config.SessionName)
 	errors.CheckAndSendResponseInternalServerError(err, w)
 
 	sessionRes := &SessionResponse{user.Id, user.Email, true}

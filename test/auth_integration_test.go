@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"hayum/core_apis/models"
-	"hayum/core_apis/routes"
+	"hayum/core_apis/route"
 	"io/ioutil"
 	"net/http"
 )

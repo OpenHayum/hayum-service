@@ -14,9 +14,9 @@ CREATE TABLE IF NOT EXISTS User
 	IsVerified   TINYINT NOT NULL DEFAULT 0,
 	IsDeleted    TINYINT NOT NULL DEFAULT 0,
 	OtpExpiresAt DATETIME,
-	CreatedDate  DATETIME NOT NULL ,
-	ModifiedDate DATETIME,
-	DeletedDate  DATETIME 
+	CreatedDate  DATETIME NOT NULL DEFAULT NOW(),
+	ModifiedDate DATETIME ON UPDATE NOW(),
+	DeletedDate  DATETIME
 );
 
 -- ************************************** Artist

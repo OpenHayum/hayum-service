@@ -2,11 +2,9 @@ package service
 
 import (
 	"context"
-	"hayum/core_apis/logger"
 	"hayum/core_apis/models"
 	"hayum/core_apis/repository"
 	"hayum/core_apis/util"
-	"time"
 )
 
 type UserService interface {
@@ -25,12 +23,10 @@ func NewUserService(repo repository.UserRepository) *userService {
 }
 
 func (s *userService) Save(ctx context.Context, u *models.User) error {
-	u.CreatedDate = time.Now()
 	password, err := util.EncryptPassword(u.Password)
 	if err != nil {
 		return err
 	}
-	logger.Log.Info("Hashed Password:", password)
 	u.Password = password
 	return s.repo.Save(ctx, u)
 }

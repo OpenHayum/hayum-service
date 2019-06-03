@@ -2,7 +2,7 @@ package test
 
 import (
 	"hayum/core_apis/db"
-	"hayum/core_apis/routes"
+	"hayum/core_apis/route"
 	"net/http/httptest"
 )
 

@@ -2,6 +2,7 @@ package route
 
 import (
 	"encoding/json"
+	"github.com/gorilla/schema"
 	"hayum/core_apis/db"
 	"hayum/core_apis/logger"
 	"hayum/core_apis/util"
@@ -74,10 +75,14 @@ func (hr *hayumRouter) JSONWithStatus(w http.ResponseWriter, status int, respons
 
 // NewRouter initializes all routes of the service
 func NewRouter(conn *db.Conn) Router {
+	var schemaDecoder = schema.NewDecoder()
+	schemaDecoder.SetAliasTag("json")
+
 	router := NewHayumRouter(util.ConstructEndpoint(apiVersion1, "/"), conn)
 
 	initUserRoute(router)
 	initAuthRoute(router)
+	initAccountRoute(router)
 
 	return router
 }

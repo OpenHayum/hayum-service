@@ -5,7 +5,7 @@ import (
 	"hayum/core_apis/config"
 	"hayum/core_apis/db"
 	"hayum/core_apis/logger"
-	route "hayum/core_apis/routes"
+	route "hayum/core_apis/route"
 	"net/http"
 	"time"
 

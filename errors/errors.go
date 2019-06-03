@@ -23,3 +23,7 @@ func CheckAndSendResponseErrorWithStatus(err error, w http.ResponseWriter, statu
 func CheckAndSendResponseInternalServerError(err error, w http.ResponseWriter) {
 	CheckAndSendResponseErrorWithStatus(err, w, http.StatusInternalServerError)
 }
+
+func CheckAndSendResponseBadRequest(err error, w http.ResponseWriter) {
+	CheckAndSendResponseErrorWithStatus(err, w, http.StatusBadRequest)
+}
