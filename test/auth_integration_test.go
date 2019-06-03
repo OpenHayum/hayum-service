@@ -8,10 +8,9 @@ import (
 	"hayum/core_apis/routes"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 )
 
-func (s *hayumSuite) loginUser(user *models.User) *route.LoginResponseBody {
+func (s *hayumSuite) loginUser(user *models.User) *http.Response {
 	s.createUser(user)
 	reqBody, err := json.Marshal(&route.LoginRequestBody{Identifier: user.Email, Password: user.Password})
 	s.checkError(err)
@@ -23,16 +22,23 @@ func (s *hayumSuite) loginUser(user *models.User) *route.LoginResponseBody {
 		s.T().Fatalf("Failed to login %s", resp.Status)
 	}
 
-	defer resp.Body.Close()
+	if resp.Header.Get("Set-Cookie") == "" {
+		s.T().Fatalf("Cookie not set in response header!")
+	}
 
+	return resp
+}
+
+func (s *hayumSuite) getLoginResponse(resp *http.Response) *models.User {
+	defer resp.Body.Close()
 	respBody, err := ioutil.ReadAll(resp.Body)
 	s.checkError(err)
 
-	var loginResp route.LoginResponseBody
-	err = json.Unmarshal(respBody, &loginResp)
+	var userRes models.User
+	err = json.Unmarshal(respBody, &userRes)
 	s.checkError(err)
 
-	return &loginResp
+	return &userRes
 }
 
 // ************************************* Auth(Register/Login) ****************************************
@@ -54,20 +60,20 @@ func (s *hayumSuite) TestRegister() {
 
 func (s *hayumSuite) TestLogin() {
 	user := getUser()
-	loginResp := s.loginUser(user)
-	assert.True(s.T(), loginResp.User.Email == user.Email, "Emails should be equal")
+	resp := s.loginUser(user)
+	loginResp := s.getLoginResponse(resp)
+	assert.True(s.T(), loginResp.Email == user.Email, "Emails should be equal")
 
 	truncate(s.Conn)
 }
 
 func (s *hayumSuite) TestLogout() {
 	user := getUser()
-	loginResp := s.loginUser(user)
+
+	resp := s.loginUser(user)
 
 	req, _ := http.NewRequest("POST", s.URL("logout"), nil)
-	req.Header.Add("user-id", strconv.Itoa(loginResp.User.Id))
-	req.Header.Add("session-id", loginResp.Session.SessionID)
-
+	//req.Header.Add("Cookie", resp.Header.Get("Set-Cookie"))
 	resp, err := s.ts.Client().Do(req)
 	s.checkError(err)
 
@@ -75,10 +81,12 @@ func (s *hayumSuite) TestLogout() {
 		s.T().Fatalf("%s %s", err, resp.Status)
 	}
 
+	req.Header.Set("Cookie", resp.Header.Get("Set-Cookie"))
+
 	resp, err = s.ts.Client().Do(req)
 	s.checkError(err)
 
-	assert.Equal(s.T(), http.StatusNotFound, resp.StatusCode, "Should return 404(Session already deleted)")
+	assert.Equal(s.T(), http.StatusForbidden, resp.StatusCode, "Should return 403(Cookie is already expired!)")
 
 	truncate(s.Conn)
 }

@@ -77,7 +77,6 @@ func NewRouter(conn *db.Conn) Router {
 	router := NewHayumRouter(util.ConstructEndpoint(apiVersion1, "/"), conn)
 
 	initUserRoute(router)
-	initSessionRoute(router)
 	initAuthRoute(router)
 
 	return router

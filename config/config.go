@@ -9,7 +9,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-const externalConfigPath = "/opt/conf/hayum"
+const (
+	externalConfigPath = "/opt/conf/hayum"
+	SessionName        = "hayum.session"
+)
 
 // Detail stores the configuration file details
 type Detail struct {

@@ -2,15 +2,14 @@ package route
 
 import (
 	"encoding/json"
-	"errors"
+	"github.com/julienschmidt/httprouter"
+	"hayum/core_apis/config"
+	"hayum/core_apis/db"
 	hyErrors "hayum/core_apis/errors"
 	"hayum/core_apis/logger"
 	"hayum/core_apis/models"
 	"hayum/core_apis/service"
 	"net/http"
-	"strconv"
-
-	"github.com/julienschmidt/httprouter"
 )
 
 type authRoute struct {
@@ -23,11 +22,6 @@ type LoginRequestBody struct {
 	Password   string
 }
 
-type LoginResponseBody struct {
-	User    *models.User
-	Session *models.Session
-}
-
 func initAuthRoute(router Router) {
 	authService := service.NewAuthService(router.GetConn())
 	u := authRoute{router, authService}
@@ -36,6 +30,14 @@ func initAuthRoute(router Router) {
 	u.router.POST("/login", u.login)
 	u.router.POST("/register", u.register)
 	u.router.POST("/logout", u.logout)
+}
+
+func handleSessionErr(err error, w http.ResponseWriter) {
+	if err != nil {
+		logger.Log.Error(err)
+		http.Error(w, hyErrors.ErrUnableToGetSession.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func (a *authRoute) login(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -49,18 +51,23 @@ func (a *authRoute) login(w http.ResponseWriter, r *http.Request, ps httprouter.
 		return
 	}
 	user := &models.User{}
-	session, err := a.service.Login(ctx, body.Identifier, body.Password, user)
+	err := a.service.Login(ctx, body.Identifier, body.Password, user)
 	if err != nil {
 		logger.Log.Error(err)
 		http.Error(w, "Not Authorized", http.StatusForbidden)
 		return
 	}
 
-	logger.Log.Info(user, session)
+	session, err := db.Store.Get(r, "hayum-session")
+	handleSessionErr(err, w)
 
-	response := &LoginResponseBody{user, session}
+	session.Values["user-id"] = user.Id
+	session.Values["email"] = user.Email
+	err = session.Save(r, w)
+	handleSessionErr(err, w)
+	//logger.Log.Info(session)
 
-	a.router.JSON(w, response)
+	a.router.JSON(w, user)
 }
 
 func (a *authRoute) register(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -79,30 +86,22 @@ func (a *authRoute) register(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	w.WriteHeader(http.StatusCreated)
-
 }
 
 func (a *authRoute) logout(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	ctx := r.Context()
-	reqUserID := r.Header.Get("user-id")
-	sessionID := r.Header.Get("session-id")
-
-	if sessionID == "" || reqUserID == "" {
-		http.Error(w, errors.New("SessionID or UserID is missing in header").Error(), http.StatusBadRequest)
+	if r.Header.Get("Cookie") == "" {
+		http.Error(w, http.ErrNoCookie.Error(), http.StatusBadRequest)
 		return
 	}
 
-	userID, _ := strconv.Atoi(reqUserID)
+	session, err := db.Store.Get(r, config.SessionName)
+	if err != nil {
+		http.Error(w, http.ErrNoCookie.Error(), http.StatusForbidden)
+		return
+	}
 
-	session := models.Session{UserID: userID, SessionID: sessionID}
-
-	if err := a.service.Logout(ctx, &session); err != nil {
-		logger.Log.Error(err)
-		status := http.StatusInternalServerError
-		if err == hyErrors.ErrSessionAlreadyDeleted {
-			status = http.StatusNotFound
-		}
-		http.Error(w, err.Error(), status)
+	if err := db.Store.Delete(r, w, session); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

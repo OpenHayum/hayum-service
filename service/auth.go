@@ -11,27 +11,23 @@ import (
 )
 
 type AuthService interface {
-	Login(ctx context.Context, identifier string, password string, user *models.User) (*models.Session, error)
+	Login(ctx context.Context, identifier string, password string, user *models.User) error
 	Register(context.Context, *models.User) error
-	Logout(context.Context, *models.Session) error
 }
 
 type authService struct {
-	userService    UserService
-	sessionService SessionService
+	userService UserService
 }
 
 func NewAuthService(conn *db.Conn) *authService {
-	sessionRepo := repository.NewSQLSessionRepository(conn)
-	sessionService := NewSessionService(sessionRepo)
 
 	userRepo := repository.NewSQLUserRepository(conn)
 	userService := NewUserService(userRepo)
 
-	return &authService{userService, sessionService}
+	return &authService{userService}
 }
 
-func (a *authService) Login(ctx context.Context, identifier string, password string, user *models.User) (*models.Session, error) {
+func (a *authService) Login(ctx context.Context, identifier string, password string, user *models.User) error {
 	emailAuth := newEmailAuthenticater(a.userService, ctx)
 	mobileAuth := newMobileAuthenticater(a.userService, ctx)
 
@@ -42,24 +38,13 @@ func (a *authService) Login(ctx context.Context, identifier string, password str
 	if !hyAuth.Authenticate(identifier, password, user) {
 		logger.Log.Error("Failed to authenticate")
 		err := errors.New("Failed to authenticate")
-		return nil, err
+		return err
 	}
 
 	logger.Log.Infof("Successfully authenticated with identifier:%s, userId: %d", identifier, user.Id)
-
-	session := &models.Session{UserID: user.Id}
-	if err := a.sessionService.Save(ctx, session); err != nil {
-		logger.Log.Error(err)
-		return nil, err
-	}
-
-	return session, nil
+	return nil
 }
 
 func (a *authService) Register(ctx context.Context, user *models.User) error {
 	return a.userService.Save(ctx, user)
-}
-
-func (a *authService) Logout(ctx context.Context, session *models.Session) error {
-	return a.sessionService.DeleteByID(ctx, session.SessionID, session.UserID)
 }
