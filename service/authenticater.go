@@ -71,7 +71,7 @@ func isPasswordEqual(passwordFromInput string, storedHashedPassword string) bool
 
 func (e *emailAuthenticater) authenticate(email string, password string, user *models.User) bool {
 	u, err := e.s.GetByEmail(e.ctx, email)
-	if err != nil || (user == &models.User{}) {
+	if err != nil || (*user == models.User{}) {
 		logger.Log.Error(err)
 		return false
 	}
@@ -86,7 +86,7 @@ func newMobileAuthenticater(s UserService, ctx context.Context) *mobileAuthentic
 
 func (e *mobileAuthenticater) authenticate(mobile string, password string, user *models.User) bool {
 	u, err := e.s.GetByMobile(e.ctx, mobile)
-	if err != nil || (user == &models.User{}) {
+	if err != nil || (*user == models.User{}) {
 		logger.Log.Error(err)
 		return false
 	}

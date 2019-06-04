@@ -24,7 +24,7 @@ type LoginRequestBody struct {
 }
 
 type SessionResponse struct {
-	UserId          int
+	UserId          int64
 	Email           string
 	IsAuthenticated bool
 }

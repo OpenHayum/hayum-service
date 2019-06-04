@@ -16,15 +16,17 @@ type AuthService interface {
 }
 
 type authService struct {
-	userService UserService
+	userService    UserService
+	accountService AccountService
 }
 
 func NewAuthService(conn *db.Conn) *authService {
-
 	userRepo := repository.NewSQLUserRepository(conn)
 	userService := NewUserService(userRepo)
+	accountRepo := repository.NewSQLAccountRepository(conn)
+	acctService := NewAccountService(accountRepo)
 
-	return &authService{userService}
+	return &authService{userService, acctService}
 }
 
 func (a *authService) Login(ctx context.Context, identifier string, password string, user *models.User) error {
@@ -46,5 +48,10 @@ func (a *authService) Login(ctx context.Context, identifier string, password str
 }
 
 func (a *authService) Register(ctx context.Context, user *models.User) error {
-	return a.userService.Save(ctx, user)
+	err := a.userService.Save(ctx, user)
+	if err != nil {
+		return err
+	}
+
+	return a.accountService.Save(ctx, new(models.Account))
 }

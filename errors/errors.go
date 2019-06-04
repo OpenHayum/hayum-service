@@ -7,9 +7,10 @@ import (
 )
 
 var (
-	ErrSessionAlreadyDeleted   = errors.New("session already deleted")
-	ErrUnableToGetSession      = errors.New("unable to create session")
-	ErrCookieMissingFromHeader = errors.New("cookie not present in header")
+	ErrSessionAlreadyDeleted              = errors.New("session already deleted")
+	ErrUnableToGetSession                 = errors.New("unable to create session")
+	ErrCookieMissingFromHeader            = errors.New("cookie not present in header")
+	ErrUserMobileOrEmailAlreadyAssociated = errors.New("mobile or email already associated with another user")
 )
 
 func CheckAndSendResponseErrorWithStatus(err error, w http.ResponseWriter, statusCode int) {

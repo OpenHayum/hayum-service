@@ -24,8 +24,21 @@ type hayumSuite struct {
 	URL  func(string) string
 }
 
+const dropTables = `
+		SET foreign_key_checks = 0;
+		DROP TABLE IF EXISTS User;
+		DROP TABLE IF EXISTS Account;
+		DROP TABLE IF EXISTS Follower;
+		SET foreign_key_checks = 1;
+	`
+
 func (s *hayumSuite) SetupSuite() {
 	s.Conn = &db.Conn{DB: db.OpenContext(context.Background(), s.Cfg)}
+	//result, err := s.Conn.Exec(dropTables)
+	//logger.Log.Info(result)
+	//if err != nil {
+	//	logger.Log.Panic(err)
+	//}
 	s.ts = newServer(s.Conn)
 	s.URL = func(pathname string) string { return s.ts.URL + "/api/v1/" + pathname }
 }
@@ -33,13 +46,7 @@ func (s *hayumSuite) SetupSuite() {
 func (s *hayumSuite) TearDownSuite() {
 	defer s.Conn.DB.DB.Close()
 	logger.Log.Info("Tearing down")
-	dropTables := `
-		SET foreign_key_checks = 0;
-		DROP TABLE IF EXISTS User;
-		DROP TABLE IF EXISTS Account;
-		DROP TABLE IF EXISTS Follower;
-		SET foreign_key_checks = 1;
-	`
+
 	result, err := s.Conn.Exec(dropTables)
 	logger.Log.Info(result)
 	if err != nil {

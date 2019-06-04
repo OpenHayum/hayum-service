@@ -3,14 +3,14 @@ package route
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/julienschmidt/httprouter"
+	"hayum/core_apis/errors"
 	"hayum/core_apis/logger"
 	"hayum/core_apis/models"
 	"hayum/core_apis/repository"
 	"hayum/core_apis/service"
+	"hayum/core_apis/util"
 	"net/http"
-	"strconv"
-
-	"github.com/julienschmidt/httprouter"
 )
 
 type userRoute struct {
@@ -29,37 +29,28 @@ func initUserRoute(router Router) {
 }
 
 func (u *userRoute) createUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var user models.User
-
+	var user *models.User
 	ctx := r.Context()
 
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	err := json.NewDecoder(r.Body).Decode(&user)
+	errors.CheckAndSendResponseBadRequest(err, w)
+
+	user, err = u.service.GetByMobileOrEmail(ctx, user.Email, user.Mobile)
+	errors.CheckAndSendResponseInternalServerError(err, w)
+	if *user != (models.User{}) {
+		errors.CheckAndSendResponseErrorWithStatus(errors.ErrUserMobileOrEmailAlreadyAssociated, w, http.StatusConflict)
 	}
 
-	//if u, _ := u.service.GetUserByEmail(user.Email); u != nil {
-	//	http.Error(w, "User already exists!", http.StatusConflict)
-	//	return
-	//}
-
-	if err := u.service.Save(ctx, &user); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	err = u.service.Save(ctx, user)
+	errors.CheckAndSendResponseInternalServerError(err, w)
 
 	u.router.JSONWithStatus(w, http.StatusCreated, user)
 }
 
 func (u *userRoute) getUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ctx := r.Context()
-	id, err := strconv.Atoi(ps.ByName("id"))
-
-	if err != nil {
-		logger.Log.Error(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	id, err := util.StrToInt64(ps.ByName("id"))
+	errors.CheckAndSendResponseBadRequest(err, w)
 
 	user, err := u.service.GetByID(ctx, id)
 

@@ -9,9 +9,10 @@ import (
 
 type UserService interface {
 	Save(ctx context.Context, u *models.User) error
-	GetByID(ctx context.Context, id int) (*models.User, error)
+	GetByID(ctx context.Context, id int64) (*models.User, error)
 	GetByEmail(ctx context.Context, email string) (*models.User, error)
 	GetByMobile(ctx context.Context, mobile string) (*models.User, error)
+	GetByMobileOrEmail(ctx context.Context, mobile, email string) (*models.User, error)
 }
 
 type userService struct {
@@ -31,7 +32,7 @@ func (s *userService) Save(ctx context.Context, u *models.User) error {
 	return s.repo.Save(ctx, u)
 }
 
-func (s *userService) GetByID(ctx context.Context, id int) (*models.User, error) {
+func (s *userService) GetByID(ctx context.Context, id int64) (*models.User, error) {
 	return s.repo.GetByID(ctx, id)
 }
 
@@ -41,4 +42,8 @@ func (s *userService) GetByEmail(ctx context.Context, email string) (*models.Use
 
 func (s *userService) GetByMobile(ctx context.Context, mobile string) (*models.User, error) {
 	return s.repo.GetByMobile(ctx, mobile)
+}
+
+func (s *userService) GetByMobileOrEmail(ctx context.Context, mobile, email string) (*models.User, error) {
+	return s.repo.GetByMobileOrEmail(ctx, mobile, email)
 }

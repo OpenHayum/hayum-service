@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net/http"
 	"path"
+	"strconv"
 )
 
 // ConstructEndpoint constructs API endpoint
@@ -55,4 +56,14 @@ func GetCookieValue(r *http.Request, name string) string {
 // GetRandID generate random string
 func GetRandID() string {
 	return uuid.New().String()
+}
+
+func StrToInt64(str string) (int64, error) {
+	i, err := strconv.ParseInt(str, 10, 64)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return i, nil
 }
