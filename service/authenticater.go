@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"hayum/core_apis/logger"
 	"hayum/core_apis/models"
 	"hayum/core_apis/util"
 )
@@ -71,8 +70,7 @@ func isPasswordEqual(passwordFromInput string, storedHashedPassword string) bool
 
 func (e *emailAuthenticater) authenticate(email string, password string, user *models.User) bool {
 	u, err := e.s.GetByEmail(e.ctx, email)
-	if err != nil || (*user == models.User{}) {
-		logger.Log.Error(err)
+	if err != nil || (*u == (models.User{})) {
 		return false
 	}
 	*user = *u
@@ -86,8 +84,7 @@ func newMobileAuthenticater(s UserService, ctx context.Context) *mobileAuthentic
 
 func (e *mobileAuthenticater) authenticate(mobile string, password string, user *models.User) bool {
 	u, err := e.s.GetByMobile(e.ctx, mobile)
-	if err != nil || (*user == models.User{}) {
-		logger.Log.Error(err)
+	if err != nil || (*u == (models.User{})) {
 		return false
 	}
 	*user = *u

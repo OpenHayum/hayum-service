@@ -2,7 +2,6 @@ package test
 
 import (
 	"encoding/json"
-	"hayum/core_apis/logger"
 	"hayum/core_apis/models"
 	"io/ioutil"
 	"net/http"
@@ -42,7 +41,6 @@ func (s *hayumSuite) TestGetUser() {
 	var u models.User
 	err = json.Unmarshal(respBody, &u)
 	s.checkError(err)
-	logger.Log.Info(u)
 	assert.True(s.T(), u.Email == user.Email)
 	truncate(s.Conn)
 }

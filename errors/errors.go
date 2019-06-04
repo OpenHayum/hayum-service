@@ -13,18 +13,20 @@ var (
 	ErrUserMobileOrEmailAlreadyAssociated = errors.New("mobile or email already associated with another user")
 )
 
-func CheckAndSendResponseErrorWithStatus(err error, w http.ResponseWriter, statusCode int) {
+func CheckAndSendResponseErrorWithStatus(err error, w http.ResponseWriter, statusCode int) bool {
 	if err != nil {
 		logger.Log.Error(err)
 		http.Error(w, err.Error(), statusCode)
-		return
+		return true
 	}
+
+	return false
 }
 
-func CheckAndSendResponseInternalServerError(err error, w http.ResponseWriter) {
-	CheckAndSendResponseErrorWithStatus(err, w, http.StatusInternalServerError)
+func CheckAndSendResponseInternalServerError(err error, w http.ResponseWriter) bool {
+	return CheckAndSendResponseErrorWithStatus(err, w, http.StatusInternalServerError)
 }
 
-func CheckAndSendResponseBadRequest(err error, w http.ResponseWriter) {
-	CheckAndSendResponseErrorWithStatus(err, w, http.StatusBadRequest)
+func CheckAndSendResponseBadRequest(err error, w http.ResponseWriter) bool {
+	return CheckAndSendResponseErrorWithStatus(err, w, http.StatusBadRequest)
 }

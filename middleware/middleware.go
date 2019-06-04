@@ -12,14 +12,15 @@ import (
 func Protected(next httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		session, err := db.Store.Get(r, config.SessionName)
-		hyErrors.CheckAndSendResponseBadRequest(err, w)
-		userVal := session.Values["user"]
-		//logger.Log.Info("Middleware:", session, userVal, r.Header.Get("Cookie"), session.IsNew)
-		if userVal == nil {
-			http.Error(w, errors.New("user not logged in").Error(), http.StatusUnauthorized)
-			return
-		}
+		if hyErrors.CheckAndSendResponseBadRequest(err, w) {
+			userVal := session.Values["user"]
+			//logger.Log.Info("Middleware:", session, userVal, r.Header.Get("Cookie"), session.IsNew)
+			if userVal == nil {
+				http.Error(w, errors.New("user not logged in").Error(), http.StatusUnauthorized)
+				return
+			}
 
-		next(w, r, ps)
+			next(w, r, ps)
+		}
 	}
 }

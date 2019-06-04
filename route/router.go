@@ -11,6 +11,8 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+var schemaDecoder = schema.NewDecoder()
+
 const apiVersion1 = "/api/v1/"
 
 // Router contains the router and mongo instance
@@ -75,9 +77,7 @@ func (hr *hayumRouter) JSONWithStatus(w http.ResponseWriter, status int, respons
 
 // NewRouter initializes all routes of the service
 func NewRouter(conn *db.Conn) Router {
-	var schemaDecoder = schema.NewDecoder()
 	schemaDecoder.SetAliasTag("json")
-
 	router := NewHayumRouter(util.ConstructEndpoint(apiVersion1, "/"), conn)
 
 	initUserRoute(router)

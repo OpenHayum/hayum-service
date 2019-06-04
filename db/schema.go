@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS User
 	IsVerified   TINYINT NOT NULL DEFAULT 0,
 	IsDeleted    TINYINT NOT NULL DEFAULT 0,
 	OtpExpiresAt DATETIME,
-	CreatedDate  DATETIME NOT NULL DEFAULT NOW(),
-	ModifiedDate DATETIME ON UPDATE NOW(),
+	CreatedDate  DATETIME DEFAULT CURRENT_TIMESTAMP,
+	ModifiedDate DATETIME ON UPDATE CURRENT_TIMESTAMP,
 	DeletedDate  DATETIME
 );
 
@@ -34,17 +34,14 @@ CREATE TABLE IF NOT EXISTS Artist
 
 CREATE TABLE IF NOT EXISTS Account
 (
-	Id                INT NOT NULL ,
+	Id                INT NOT NULL AUTO_INCREMENT,
 	UserId            INT NOT NULL ,
 	IsPremium         TINYINT NOT NULL ,
-	ViewsNum          INT NOT NULL ,
-	FavoritesNum      INT NOT NULL ,
-	TracksUploadedNum INT NOT NULL ,
 	AccountImageLink  VARCHAR(45) NOT NULL ,
 	CoverImageLink    VARCHAR(45) NOT NULL ,
-	IsDeleted         TINYINT NOT NULL ,
+	IsDeleted         TINYINT NOT NULL DEFAULT 0,
 	CreatedDate       DATETIME NOT NULL DEFAULT NOW(),
-	ModifiedDate      DATETIME,
+	ModifiedDate      DATETIME ON UPDATE CURRENT_TIMESTAMP,
 	DeletedDate       DATETIME,
 	PRIMARY KEY (Id, UserId),
 	CONSTRAINT FK_ACCOUNT_USER_USERID FOREIGN KEY  (UserId) REFERENCES User (Id)

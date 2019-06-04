@@ -45,20 +45,28 @@ func (a *authRoute) login(w http.ResponseWriter, r *http.Request, ps httprouter.
 
 	body := LoginRequestBody{}
 	err := json.NewDecoder(r.Body).Decode(&body)
-	errors.CheckAndSendResponseErrorWithStatus(err, w, http.StatusBadRequest)
+	if errors.CheckAndSendResponseErrorWithStatus(err, w, http.StatusBadRequest) {
+		return
+	}
 
 	user := &models.User{}
 	err = a.service.Login(ctx, body.Identifier, body.Password, user)
-	errors.CheckAndSendResponseErrorWithStatus(err, w, http.StatusForbidden)
+	if errors.CheckAndSendResponseErrorWithStatus(err, w, http.StatusForbidden) {
+		return
+	}
 
 	session, err := db.Store.Get(r, config.SessionName)
-	errors.CheckAndSendResponseInternalServerError(err, w)
+	if errors.CheckAndSendResponseInternalServerError(err, w) {
+		return
+	}
 
 	sessionRes := &SessionResponse{user.Id, user.Email, true}
 	session.Values["user"] = sessionRes
 
 	err = session.Save(r, w)
-	errors.CheckAndSendResponseInternalServerError(err, w)
+	if errors.CheckAndSendResponseInternalServerError(err, w) {
+		return
+	}
 
 	a.router.JSON(w, user)
 }
@@ -67,10 +75,14 @@ func (a *authRoute) register(w http.ResponseWriter, r *http.Request, ps httprout
 	ctx := r.Context()
 	body := models.User{}
 	err := json.NewDecoder(r.Body).Decode(&body)
-	errors.CheckAndSendResponseErrorWithStatus(err, w, http.StatusBadRequest)
+	if errors.CheckAndSendResponseErrorWithStatus(err, w, http.StatusBadRequest) {
+		return
+	}
 
 	err = a.service.Register(ctx, &body)
-	errors.CheckAndSendResponseInternalServerError(err, w)
+	if errors.CheckAndSendResponseInternalServerError(err, w) {
+		return
+	}
 
 	w.WriteHeader(http.StatusCreated)
 }
@@ -85,17 +97,23 @@ func (a *authRoute) logout(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	// check for request which are already logged out
 	if err != nil || session.Values["user"] == nil {
-		errors.CheckAndSendResponseErrorWithStatus(err, w, http.StatusForbidden)
+		if errors.CheckAndSendResponseErrorWithStatus(err, w, http.StatusForbidden) {
+			return
+		}
 	}
 
 	session.Options.MaxAge = -1
 	session.Values["user"] = &SessionResponse{}
 
 	err = session.Save(r, w)
-	errors.CheckAndSendResponseInternalServerError(err, w)
+	if errors.CheckAndSendResponseInternalServerError(err, w) {
+		return
+	}
 
 	err = db.Store.Delete(r, w, session)
-	errors.CheckAndSendResponseInternalServerError(err, w)
+	if errors.CheckAndSendResponseInternalServerError(err, w) {
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 }

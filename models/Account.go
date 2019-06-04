@@ -7,10 +7,10 @@ type Account struct {
 	CoverImageLink   string
 	CreatedDate      time.Time
 	DeletedDate      time.Time
-	ID               int
+	Id               int64
 	IsDeleted        int
 	IsPremium        int
 	ModifiedDate     time.Time
-	UserID           int
+	UserId           int64
 	ViewsNum         int
 }

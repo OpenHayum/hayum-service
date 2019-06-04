@@ -20,8 +20,8 @@ func NewSQLAccountRepository(conn *db.Conn) *sqlAccountRepo {
 }
 
 func (r *sqlAccountRepo) Save(ctx context.Context, acc *models.Account) error {
-	stmt := "INSERT INTO User (UserId, IsPremium, AccountImageLink, CoverImageLink) VALUES (?, ?, ?, ?)"
-	_, err := r.conn.ExecContext(ctx, stmt, acc.UserID, acc.IsPremium, acc.AccountImageLink, acc.CoverImageLink)
+	stmt := "INSERT INTO Account (UserId, IsPremium, AccountImageLink, CoverImageLink) VALUES (?, ?, ?, ?)"
+	_, err := r.conn.ExecContext(ctx, stmt, acc.UserId, acc.IsPremium, acc.AccountImageLink, acc.CoverImageLink)
 	if err != nil {
 		return err
 	}

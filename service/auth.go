@@ -38,7 +38,6 @@ func (a *authService) Login(ctx context.Context, identifier string, password str
 	hyAuth.Add(mobileAuth)
 
 	if !hyAuth.Authenticate(identifier, password, user) {
-		logger.Log.Error("Failed to authenticate")
 		err := errors.New("Failed to authenticate")
 		return err
 	}
@@ -52,6 +51,8 @@ func (a *authService) Register(ctx context.Context, user *models.User) error {
 	if err != nil {
 		return err
 	}
+	//logger.Log.Info("id: ", user.Id)
+	acct := &models.Account{UserId: user.Id}
 
-	return a.accountService.Save(ctx, new(models.Account))
+	return a.accountService.Save(ctx, acct)
 }

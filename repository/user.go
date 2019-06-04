@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"hayum/core_apis/db"
+	"hayum/core_apis/logger"
 	"hayum/core_apis/models"
 )
 
@@ -31,7 +32,7 @@ func (r *sqlUserRepo) Save(ctx context.Context, u *models.User) error {
 	}
 
 	u.Id, err = res.LastInsertId()
-	return nil
+	return err
 }
 
 func (r *sqlUserRepo) GetByID(ctx context.Context, id int64) (*models.User, error) {
@@ -48,6 +49,7 @@ func (r *sqlUserRepo) GetByEmail(ctx context.Context, email string) (*models.Use
 	stmt := "SELECT * FROM User WHERE Email=?"
 	user := models.User{}
 	err := r.conn.GetContext(ctx, &user, stmt, email)
+	logger.Log.Info("User:", user)
 	if err == sql.ErrNoRows {
 		return &user, nil
 	}
@@ -58,6 +60,7 @@ func (r *sqlUserRepo) GetByMobile(ctx context.Context, mobile string) (*models.U
 	stmt := "SELECT * FROM User WHERE Mobile=?"
 	user := models.User{}
 	err := r.conn.GetContext(ctx, &user, stmt, mobile)
+	logger.Log.Info("User:", user)
 	if err == sql.ErrNoRows {
 		return &user, nil
 	}

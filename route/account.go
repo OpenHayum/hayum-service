@@ -31,10 +31,14 @@ func initAccountRoute(router Router) {
 func (ar *accountRoute) createAccount(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	acct := new(models.Account)
 	err := json.NewDecoder(r.Body).Decode(acct)
-	errors.CheckAndSendResponseBadRequest(err, w)
+	if errors.CheckAndSendResponseBadRequest(err, w) {
+		return
+	}
 
 	err = ar.service.Save(r.Context(), acct)
-	errors.CheckAndSendResponseInternalServerError(err, w)
+	if errors.CheckAndSendResponseInternalServerError(err, w) {
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 }
@@ -42,7 +46,9 @@ func (ar *accountRoute) createAccount(w http.ResponseWriter, r *http.Request, _ 
 func (ar *accountRoute) getAccount(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	idStr := ps.ByName("id")
 	acctId, err := strconv.Atoi(idStr)
-	errors.CheckAndSendResponseBadRequest(err, w)
+	if errors.CheckAndSendResponseBadRequest(err, w) {
+		return
+	}
 	acct, err := ar.service.GetByID(r.Context(), acctId)
 
 	ar.router.JSON(w, acct)

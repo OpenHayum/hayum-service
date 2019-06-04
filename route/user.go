@@ -33,16 +33,25 @@ func (u *userRoute) createUser(w http.ResponseWriter, r *http.Request, ps httpro
 	ctx := r.Context()
 
 	err := json.NewDecoder(r.Body).Decode(&user)
-	errors.CheckAndSendResponseBadRequest(err, w)
+	if errors.CheckAndSendResponseBadRequest(err, w) {
+		return
+	}
+	logger.Log.Info("uuu", user)
 
-	user, err = u.service.GetByMobileOrEmail(ctx, user.Email, user.Mobile)
-	errors.CheckAndSendResponseInternalServerError(err, w)
-	if *user != (models.User{}) {
-		errors.CheckAndSendResponseErrorWithStatus(errors.ErrUserMobileOrEmailAlreadyAssociated, w, http.StatusConflict)
+	createdUser, err := u.service.GetByMobileOrEmail(ctx, user.Email, user.Mobile)
+	if errors.CheckAndSendResponseInternalServerError(err, w) {
+		return
+	}
+	if *createdUser != (models.User{}) {
+		if errors.CheckAndSendResponseErrorWithStatus(errors.ErrUserMobileOrEmailAlreadyAssociated, w, http.StatusConflict) {
+			return
+		}
 	}
 
 	err = u.service.Save(ctx, user)
-	errors.CheckAndSendResponseInternalServerError(err, w)
+	if errors.CheckAndSendResponseInternalServerError(err, w) {
+		return
+	}
 
 	u.router.JSONWithStatus(w, http.StatusCreated, user)
 }
@@ -50,7 +59,9 @@ func (u *userRoute) createUser(w http.ResponseWriter, r *http.Request, ps httpro
 func (u *userRoute) getUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	ctx := r.Context()
 	id, err := util.StrToInt64(ps.ByName("id"))
-	errors.CheckAndSendResponseBadRequest(err, w)
+	if errors.CheckAndSendResponseBadRequest(err, w) {
+		return
+	}
 
 	user, err := u.service.GetByID(ctx, id)
 

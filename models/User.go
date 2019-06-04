@@ -2,7 +2,6 @@ package models
 
 import (
 	"gopkg.in/guregu/null.v3"
-	"time"
 )
 
 type User struct {
@@ -16,7 +15,7 @@ type User struct {
 	IsDeleted    int
 	IsVerified   int
 	OtpExpiresAt null.Time
-	CreatedDate  time.Time
+	CreatedDate  null.Time
 	DeletedDate  null.Time
 	ModifiedDate null.Time
 }
