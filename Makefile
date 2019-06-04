@@ -27,3 +27,9 @@ test-integration:
 test-integration-coverage:
 	GO_ENV=integration go test ./test... -cover -coverprofile=coverage.out
 	go tool cover -func=coverage.out
+
+ui-build:
+	cd frontend; yarn build
+
+ui-start:
+	cd frontend; yarn start
